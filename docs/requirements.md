@@ -42,6 +42,22 @@ This document lists the functional and non-functional requirements of GSMF, a CL
 
 ## 3\. Functional Requirements
 
+### FR-1 to FR-7 — Benchmark Execution and Measurement
+
+**FR-1 — Benchmark configuration.** The system shall load a YAML configuration specifying target platforms, workload size, concurrency, repetition count and cooldown duration. It shall reject missing required fields, unsupported targets and invalid numeric values with an explanatory error before starting a platform stack. Workload size, concurrency and repetition count shall be positive integers; cooldown duration shall be non-negative.
+
+**FR-2 — Execution prerequisites.** Before a benchmark begins, the system shall check Docker availability, access to the required RAPL counters and connectivity to the load generator with k6 available. It shall record the testbed CPU governor and Turbo Boost setting, and prevent execution when the required fixed-governor and disabled-Turbo conditions cannot be confirmed. Failed checks shall identify the unmet prerequisite.
+
+**FR-3 — Isolated stack lifecycle.** The system shall start each selected target using its Docker Compose configuration and wait for its health checks to pass within a defined timeout before measuring it. It shall stop the target after completion or failure and shall not start the next target until shutdown is confirmed. A failed startup, health check or shutdown shall be reported as an execution failure.
+
+**FR-4 — Repetition and cooldown control.** The system shall execute the configured number of repetitions for each selected platform and apply the configured cooldown between consecutive repetitions and platform transitions. It shall assign each repetition an identifier and record its target, configuration and completion status. Failed repetitions shall be retained as failed records and excluded from valid measurement aggregates.
+
+**FR-5 — Idle baseline measurement.** With the target running and no reference workload active, the system shall measure RAPL energy over a recorded idle interval and calculate average idle power as idle energy divided by interval duration. It shall record the sampled RAPL domains and use the same domains for the corresponding workload measurement. Unreadable counters or a non-positive interval shall invalidate the measurement.
+
+**FR-6 — Remote reference workload.** The system shall trigger the k6 workload on the separate load-generator machine using the configured workload size and concurrency. The workload shall implement the defined user-task sequence of item creation, paginated listing and batch update. The system shall collect execution status, elapsed time, completed user-task count and workload errors; only fully successful sequences shall count as completed user tasks. Remote execution failures shall mark the repetition as failed.
+
+**FR-7 — Workload energy and baseline correction.** The system shall measure gross RAPL energy over the workload interval and calculate net energy as gross energy minus average idle power multiplied by the measured interval duration. Counter differences shall account for wraparound using the reported counter range. Each record shall retain gross energy, idle power, interval duration, net energy and completed user-task count. Unusable counter readings, negative net energy or zero completed user tasks shall be flagged as invalid and excluded from valid measurement aggregates, without silently replacing the measured values.
+
 ## 4\. Non-Functional Requirements
 
 ## 5\. Document-Specific Task Matrix
