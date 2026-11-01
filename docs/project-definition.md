@@ -47,7 +47,23 @@ By the end of the project we aim to:
 
 ## 4\. Scope
 
-The project covers the design, implementation and evaluation of GSMF as a reproducible benchmarking framework for three self-hosted application implementations.
+**Included**
+
+* Self-hosted, Docker-based deployments of Budibase and Appsmith, plus a FastAPI + SQLite baseline.
+* One standardized reference application and workload, driven by k6 from a second machine.
+* CPU package (and DRAM where available) energy measurement through Linux RAPL sysfs.
+* Idle baseline subtraction, repeated trials, statistical aggregation and operational SCI calculation.
+* CLI tool, CSV/Markdown reports and a lightweight web dashboard.
+* Optional per-container breakdown with Scaphandre as a secondary diagnostic.
+
+**Not included**
+
+* Vendor-hosted SaaS/cloud low-code platforms (e.g., Bubble, OutSystems Cloud), because their servers cannot be instrumented.
+* Browser/frontend rendering energy measurement.
+* Embodied carbon (the M term of SCI); documented as future work.
+* Converting network traffic into energy; network data is recorded only as secondary telemetry.
+* Kubernetes deployments, external hardware power meters, and non-x86 hardware.
+
 
 **In scope:**
 
@@ -66,6 +82,9 @@ The project covers the design, implementation and evaluation of GSMF as a reprod
 The system boundary includes the benchmark controller, platform stacks, measurement and analysis modules, and reporting components. The remote load generator supplies the workload; its energy consumption is outside the reported measurement boundary. Results describe the selected reference application and test environment, rather than whole-system electricity consumption.
 
 ## 5\. Target Audience
+* Software developers and citizen developers choosing between low-code platforms and hand-coding.
+* IT and sustainability managers who need evidence about the energy cost of software choices.
+* Students and researchers working on green software and software measurement.
 
 | Audience | Intended Use |
 | --- | --- |
@@ -100,14 +119,33 @@ The CLI is intended for technical users familiar with Linux, Docker and basic be
 
 ## 8\. Budget and Resources
 
+* **Team:** Four members (roles listed in the Project Plan).
+* **Software (free/open source):** Python 3.11, FastAPI, SQLite, Docker and Docker Compose, Budibase and Appsmith community editions, k6, Scaphandre, Git/GitHub.
+* **Hardware:** One Intel-based x86 machine running Ubuntu as the testbed (a desktop or mini PC preferred; a laptop on AC power is the fallback), one team laptop as the load generator, and a local network switch or router.
+* **Learning resources:** Green Software Foundation SCI specification, Pereira et al. (2017), platform and tool documentation.
+* **Time:** One semester (October 2026 – January 2027).
+* **Budget:** No paid services are required; all tools are free or open source and run on team-owned hardware. Expected cost is 0 TL.
 
 
 ## 9\. Risks and Mitigation Strategies
 
+| Risk | Impact | Mitigation |
+|---|---|---|
+| RAPL not available or blocked on the testbed hardware | Measurements impossible | Verify RAPL access in week 1; keep a second team machine as backup testbed |
+| Measurement noise from thermal throttling or background processes | Unreliable results | Fix CPU governor, disable Turbo Boost, cooldown between runs, headless OS, 10+ repetitions |
+| Building the same app on three platforms takes longer than planned | Schedule delay | Keep the reference app to three operations; build FastAPI baseline first |
+| Low-code platform setup or version issues in Docker | Blocked experiments | Pin platform versions in Compose files; document setup steps |
+| Team member unavailability | Lost capacity | Shared task matrix, pair ownership of critical modules, weekly status check |
+| Scope creep in the dashboard | Less time for measurement | CLI first; dashboard only after measurement pipeline is stable |
+
 
 
 ## 10\. Project Success Criteria
-
+1. The reference application runs successfully on all three targets and completes 100% of workload tasks in each benchmark run.
+2. At least 10 repetitions per platform are collected, with a 95% confidence interval half-width below 10% of the mean net energy.
+3. All seven key features are implemented and demonstrated end to end with a single CLI command.
+4. Another team member can reproduce a full benchmark from the repository instructions on the testbed without code changes.
+5. The final report presents energy per task, EDP and operational SCI for all three platforms.
 
 
 ## 11\. Document-Specific Task Matrix

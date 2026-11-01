@@ -162,12 +162,90 @@ Changes are classified by their effect on scope, schedule and measurement validi
 
 **Measurement freeze:** during the controlled benchmark campaign (P6), the workload, configuration and container versions are frozen. Only critical fixes are allowed; any change that affects measurements invalidates the affected runs, which are repeated before the dataset is accepted.
 
-## 9\. Budget Plan
+## 9. Budget Plan
 
-## 10\. Effort Estimation
+The project has no monetary cost; all software is free or open source and hardware is owned by the team. The main budget is team effort (392 person-hours in total, see Section 10), allocated as follows:
+
+| Phase | Person-hours | Share |
+|---|---|---|
+| Requirements and planning | 40 | 10% |
+| Design | 48 | 12% |
+| Development | 192 | 49% |
+| Testing and experiments | 56 | 14% |
+| Documentation and deployment | 40 | 10% |
+| Closure (presentation) | 16 | 4% |
+| **Total** | **392** | **100%** |
+
+## 10. Effort Estimation
+
+**Method:** Bottom-up estimation with expert judgment and analogy. Each phase was broken into tasks, each task was estimated by the member most familiar with it (based on similar coursework projects), and the estimates were discussed and adjusted as a team.
+
+### 10.1 Effort per Task
+
+| Phase | Task | Person-hours | Owner |
+|---|---|---|---|
+| Requirements and planning | Project documents for Assignment 1 | 40 | All (Reşat 12, Bülent 16, Murat 6, Furkan 6) |
+| Design | Architecture, app spec, experiment design | 48 | All (12 each) |
+| Development | Testbed setup and RAPL reader | 24 | Reşat |
+| Development | FastAPI reference app | 16 | Murat |
+| Development | Budibase reference app | 24 | Bülent |
+| Development | Appsmith reference app | 24 | Furkan |
+| Development | k6 workload scripts | 16 | Furkan |
+| Development | CLI runner and Docker lifecycle | 32 | Murat |
+| Development | Statistics, EDP and SCI module | 16 | Reşat |
+| Development | Storage, CSV export and reports | 16 | Bülent |
+| Development | Web dashboard | 24 | Murat |
+| Testing | Unit and integration tests | 24 | Bülent 12, Furkan 12 |
+| Testing | Benchmark runs and validation | 32 | Reşat 16, Furkan 16 |
+| Documentation | Final report, README, setup guide | 40 | All (10 each) |
+| Closure | Presentation preparation | 16 | All (4 each) |
+
+### 10.2 Effort per Person
+
+| Member | Person-hours |
+|---|---|
+| Reşat Efe Koca | 94 |
+| Bülent Çakır | 94 |
+| Murat Yılmaz | 104 |
+| Furkan Yaman | 100 |
+| **Total project effort** | **392** |
 
 ## 11\. Task Assignments
+### 11.1 Task Matrix (Phases and Functional Requirements)
 
+|Item|Reşat|Bülent|Murat|Furkan|
+|-|-|-|-|-|
+|Requirements and planning|R|**A**|R|R|
+|Design|**A**|R|R|R|
+|FR-1 Configuration file|||**A**||
+|FR-2 Reference application||R (Budibase)|**A** (FastAPI)|R (Appsmith)|
+|FR-3 Docker stack lifecycle|||**A**||
+|FR-4 Idle power measurement|**A**||||
+|FR-5 Warm-up phase||||**A**|
+|FR-6 Remote k6 workload and energy|R|||**A**|
+|FR-7 Net energy, energy per task, EDP|**A**||||
+|FR-8 Repetitions and cooldown|||**A**||
+|FR-9 Statistics|**A**||||
+|FR-10 Operational SCI|**A**||||
+|FR-11 Storage and CSV export||**A**|||
+|FR-12 Terminal summary and report||**A**|||
+|FR-13 Dashboard|||**A**||
+|FR-14 Scaphandre (optional)|**A**||||
+|Testing and NFR verification|R|R||**A**|
+|Documentation|R|**A**|R|R|
+
+**A** = accountable owner, **R** = contributes.
+
+### 11.2 Rationale for Task Assignment
+
+Tasks were assigned by matching skills and interests: Reşat has embedded Linux and hardware experience, so he owns the RAPL and measurement parts and project management; Murat has the strongest backend experience, so he leads the CLI architecture and dashboard; Bülent focuses on requirements and documentation and builds the Budibase app to learn a low-code tool; Furkan owns testing and the k6 workload, which fits his interest in quality assurance. Each member also builds or tests part of a reference application so that everyone learns the low-code platforms. Total effort per person is within about 10% of the average (98 hours), which keeps the distribution fair.
+
+### 11.3 Clarity of Contribution on GitHub
+
+* Every member commits from their own GitHub account.
+* Commit messages follow the format `\\\[area] short description` (e.g., `\\\[rapl] add idle power sampler`).
+* Code is organized by module (`gsmf/measurement`, `gsmf/runner`, `gsmf/report`, `apps/`, `workload/`, `docs/`), so ownership matches folders.
+* Each Issue and Pull Request is assigned to its owner.
 ## 12\. Document-Specific Task Matrix
 
 |Task|Responsible|
