@@ -141,7 +141,11 @@ The CLI is intended for technical users familiar with Linux, Docker and basic be
 
 
 ## 10\. Project Success Criteria
-
+1. The reference application runs successfully on all three targets and completes 100% of workload tasks in each benchmark run.
+2. At least 10 repetitions per platform are collected, with a 95% confidence interval half-width below 10% of the mean net energy.
+3. All seven key features are implemented and demonstrated end to end with a single CLI command.
+4. Another team member can reproduce a full benchmark from the repository instructions on the testbed without code changes.
+5. The final report presents energy per task, EDP and operational SCI for all three platforms.
 
 
 ## 11\. Document-Specific Task Matrix
