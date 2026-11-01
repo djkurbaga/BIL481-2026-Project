@@ -47,7 +47,23 @@ By the end of the project we aim to:
 
 ## 4\. Scope
 
-The project covers the design, implementation and evaluation of GSMF as a reproducible benchmarking framework for three self-hosted application implementations.
+**Included**
+
+* Self-hosted, Docker-based deployments of Budibase and Appsmith, plus a FastAPI + SQLite baseline.
+* One standardized reference application and workload, driven by k6 from a second machine.
+* CPU package (and DRAM where available) energy measurement through Linux RAPL sysfs.
+* Idle baseline subtraction, repeated trials, statistical aggregation and operational SCI calculation.
+* CLI tool, CSV/Markdown reports and a lightweight web dashboard.
+* Optional per-container breakdown with Scaphandre as a secondary diagnostic.
+
+**Not included**
+
+* Vendor-hosted SaaS/cloud low-code platforms (e.g., Bubble, OutSystems Cloud), because their servers cannot be instrumented.
+* Browser/frontend rendering energy measurement.
+* Embodied carbon (the M term of SCI); documented as future work.
+* Converting network traffic into energy; network data is recorded only as secondary telemetry.
+* Kubernetes deployments, external hardware power meters, and non-x86 hardware.
+
 
 **In scope:**
 
@@ -66,6 +82,9 @@ The project covers the design, implementation and evaluation of GSMF as a reprod
 The system boundary includes the benchmark controller, platform stacks, measurement and analysis modules, and reporting components. The remote load generator supplies the workload; its energy consumption is outside the reported measurement boundary. Results describe the selected reference application and test environment, rather than whole-system electricity consumption.
 
 ## 5\. Target Audience
+* Software developers and citizen developers choosing between low-code platforms and hand-coding.
+* IT and sustainability managers who need evidence about the energy cost of software choices.
+* Students and researchers working on green software and software measurement.
 
 | Audience | Intended Use |
 | --- | --- |
