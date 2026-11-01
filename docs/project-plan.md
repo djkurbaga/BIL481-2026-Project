@@ -157,7 +157,19 @@ Changes are classified by their effect on scope, schedule and measurement validi
 
 **Measurement freeze:** during the controlled benchmark campaign (P6), the workload, configuration and container versions are frozen. Only critical fixes are allowed; any change that affects measurements invalidates the affected runs, which are repeated before the dataset is accepted.
 
-## 9\. Budget Plan
+## 9. Budget Plan
+
+The project has no monetary cost; all software is free or open source and hardware is owned by the team. The main budget is team effort (392 person-hours in total, see Section 10), allocated as follows:
+
+| Phase | Person-hours | Share |
+|---|---|---|
+| Requirements and planning | 40 | 10% |
+| Design | 48 | 12% |
+| Development | 192 | 49% |
+| Testing and experiments | 56 | 14% |
+| Documentation and deployment | 40 | 10% |
+| Closure (presentation) | 16 | 4% |
+| **Total** | **392** | **100%** |
 
 ## 10\. Effort Estimation
 
