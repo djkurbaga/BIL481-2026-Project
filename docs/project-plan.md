@@ -65,31 +65,36 @@ The schedule below is a planning baseline aligned with the existing objectives: 
 |**P1 — Requirements and planning**|1–8 November 2026|Initial project definition|Scope, requirements and responsibilities reviewed; implementation tasks tracked as GitHub Issues.|
 |**P2 — Architecture and testbed preparation**|9–15 November 2026|P1|Module interfaces, configuration and result-record structure agreed; Docker, RAPL and remote k6 feasibility demonstrated.|
 |**P3 — Reference applications and workload**|16–29 November 2026|P2|Three applications implement the same user-task semantics; common datasets and k6 workload pass functional checks.|
-|**P4 — CLI and measurement integration**|16 November–20 December 2026|P2; P3 required for final integration|CLI completes stack startup, idle measurement, remote workload, energy calculation, result storage and cleanup for all three targets.|
-|**P5 — Validation and reporting tools**|21 December 2026–3 January 2027|P3, P4|Pilot runs validate measurements and failure handling; statistical outputs, exports and dashboard are ready.|
-|**P6 — Controlled benchmark campaign**|4–10 January 2027|P5|At least 10 valid repetitions per platform collected with recorded configurations and experimental conditions.|
-|**P7 — Analysis and final delivery preparation**|11–20 January 2027|P6|Comparative report, reproducibility instructions, final documentation and presentation material completed.|
+|**P4 — CLI and measurement integration**|16 November–6 December 2026|P2; P3 required for final integration|CLI completes stack startup, idle measurement, remote workload, energy calculation, result storage and cleanup for all three targets.|
+|**P5 — Validation and reporting tools**|7–13 December 2026|P3, P4|Pilot runs validate measurements and failure handling; statistical outputs, exports and dashboard are ready.|
+|**P6 — Controlled benchmark campaign**|14–20 December 2026|P5|At least 10 valid repetitions per platform collected with recorded configurations and experimental conditions.|
+|**P7 — Analysis and final delivery preparation**|21–27 December 2026|P6|Comparative report, reproducibility instructions, final documentation and presentation material completed.|
 
-```mermaid
-gantt
-    title GSMF Planned Project Schedule
-    dateFormat YYYY-MM-DD
-    axisFormat %d %b
-    section Definition and Design
-    Requirements and planning          :p1, 2026-11-01, 2026-11-09
-    Architecture and testbed            :p2, 2026-11-09, 2026-11-16
-    section Implementation
-    Reference applications and workload :p3, 2026-11-16, 2026-11-30
-    CLI and measurement integration     :p4, 2026-11-16, 2026-12-21
-    End-to-end CLI target               :milestone, 2026-12-20, 0d
-    section Evaluation and Delivery
-    Validation and reporting tools      :p5, 2026-12-21, 2027-01-04
-    Controlled benchmark campaign       :p6, 2027-01-04, 2027-01-11
-    Analysis and documentation          :p7, 2027-01-11, 2027-01-21
-    Final report target                :milestone, 2027-01-20, 0d
-```
+|Phase|Start|End|Duration (days)|W1|W2|W3|W4|W5|W6|W7|W8|W9|W10|W11|
 
-Gantt bars use the following day as the exclusive end date to match the inclusive date ranges in the table. Progress is assessed against the completion milestones during weekly meetings. Delays affecting the measurement pipeline take priority over dashboard enhancements; failed experimental runs are repeated before the final dataset is accepted.
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+
+|P1 — Requirements and planning|12 Oct 2026|01 Nov 2026|21|■|■|■| | | | | | | | |
+
+|P2 — Architecture and testbed|02 Nov 2026|15 Nov 2026|14| | | |■|■| | | | | | |
+
+|P3 — Reference applications and workload|16 Nov 2026|29 Nov 2026|14| | | | | |■|■| | | | |
+
+|P4 — CLI and measurement integration|16 Nov 2026|06 Dec 2026|21| | | | | |■|■|■| | | |
+
+|P5 — Validation and reporting tools|07 Dec 2026|13 Dec 2026|7| | | | | | | | |■| | |
+
+|P6 — Controlled benchmark campaign|14 Dec 2026|20 Dec 2026|7| | | | | | | | | |■| |
+
+|P7 — Analysis and final delivery|21 Dec 2026|27 Dec 2026|7| | | | | | | | | | |■|
+
+
+
+Weeks: W1 = 12–18 Oct, W2 = 19–25 Oct, W3 = 26 Oct–1 Nov, W4 = 2–8 Nov, W5 = 9–15 Nov, W6 = 16–22 Nov, W7 = 23–29 Nov, W8 = 30 Nov–6 Dec, W9 = 7–13 Dec, W10 = 14–20 Dec, W11 = 21–27 Dec.
+
+
+
+Milestones: Assignment 1 (01 Nov, end of W3), Assignment 2 (15 Nov, end of W5), Assignment 3 (29 Nov, end of W7), Assignment 4 Bonus (05 Dec, W8), end-to-end CLI target (06 Dec, end of W8), final report target (27 Dec, end of W11).Gantt bars use the following day as the exclusive end date to match the inclusive date ranges in the table. Progress is assessed against the completion milestones during weekly meetings. Delays affecting the measurement pipeline take priority over dashboard enhancements; failed experimental runs are repeated before the final dataset is accepted.
 
 ## 5\. Resource Planning
 

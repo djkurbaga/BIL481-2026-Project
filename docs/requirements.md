@@ -58,6 +58,20 @@ This document lists the functional and non-functional requirements of GSMF, a CL
 
 **FR-7 — Workload energy and baseline correction.** The system shall measure gross RAPL energy over the workload interval and calculate net energy as gross energy minus average idle power multiplied by the measured interval duration. Counter differences shall account for wraparound using the reported counter range. Each record shall retain gross energy, idle power, interval duration, net energy and completed user-task count. Unusable counter readings, negative net energy or zero completed user tasks shall be flagged as invalid and excluded from valid measurement aggregates, without silently replacing the measured values.
 
+**FR-8 — Efficiency metrics.** For each valid repetition, the system shall calculate energy per completed user task as net energy divided by completed user-task count, and the Energy-Delay Product (EDP) as net energy multiplied by the measured interval duration. Units shall be recorded as joules per user task and joule-seconds. Metrics shall not be calculated for invalid or failed repetitions.
+
+**FR-9 — Statistical aggregation.** For each target, the system shall aggregate valid repetitions and calculate the mean, median, standard deviation and 95% confidence interval of net energy, interval duration, energy per user task and EDP. It shall report the number of valid and failed repetitions used for each target. When fewer than two valid repetitions exist, the system shall report that the confidence interval cannot be calculated instead of producing a value.
+
+**FR-10 — Operational SCI calculation.** The system shall calculate operational SCI per target as net energy in kWh multiplied by the configured grid carbon intensity in gCO2eq/kWh, divided by completed user tasks, and report it in gCO2eq per 1,000 user tasks. The grid carbon intensity, its unit and source shall be read from the configuration and stored with the results. Embodied carbon shall not be included, and the report shall state this boundary.
+
+**FR-11 — Result persistence and export.** The system shall store every repetition record, including failed and invalid ones with their status and reason, together with the configuration, target versions and testbed settings, in an SQLite database. The user shall be able to export raw repetition records and aggregated results of a selected run as CSV files. Stored measured values shall not be modified by later calculations.
+
+**FR-12 — Summary and report generation.** After a run completes, the system shall display a terminal summary table comparing all targets by net energy, energy per user task, EDP, operational SCI and confidence intervals. It shall generate a Markdown report containing the same results, run configuration, experimental conditions and the number of valid and failed repetitions. Reports shall be generated only from stored records.
+
+**FR-13 — Results dashboard.** The system shall provide a local web dashboard where the user can select a completed run and view a comparison table and bar charts of energy per user task and EDP for each target. Displayed values shall match the stored aggregated results and CSV export of the same run.
+
+**FR-14 — Optional per-container diagnostics.** When enabled in the configuration, the system shall collect per-container energy shares using Scaphandre during the workload interval and include them in the report as a secondary diagnostic. These values shall be labeled as estimates and shall not replace or alter the RAPL-based net energy results. If Scaphandre is unavailable, the system shall continue the run and record that diagnostics were skipped.
+
 ## 4\. Non-Functional Requirements
 
 ## 5\. Document-Specific Task Matrix
