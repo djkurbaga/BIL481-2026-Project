@@ -206,7 +206,41 @@ The project has no monetary cost; all software is free or open source and hardwa
 | **Total project effort** | **392** |
 
 ## 11\. Task Assignments
+### 11.1 Task Matrix (Phases and Functional Requirements)
 
+|Item|Reşat|Bülent|Murat|Furkan|
+|-|-|-|-|-|
+|Requirements and planning|R|**A**|R|R|
+|Design|**A**|R|R|R|
+|FR-1 Configuration file|||**A**||
+|FR-2 Reference application||R (Budibase)|**A** (FastAPI)|R (Appsmith)|
+|FR-3 Docker stack lifecycle|||**A**||
+|FR-4 Idle power measurement|**A**||||
+|FR-5 Warm-up phase||||**A**|
+|FR-6 Remote k6 workload and energy|R|||**A**|
+|FR-7 Net energy, energy per task, EDP|**A**||||
+|FR-8 Repetitions and cooldown|||**A**||
+|FR-9 Statistics|**A**||||
+|FR-10 Operational SCI|**A**||||
+|FR-11 Storage and CSV export||**A**|||
+|FR-12 Terminal summary and report||**A**|||
+|FR-13 Dashboard|||**A**||
+|FR-14 Scaphandre (optional)|**A**||||
+|Testing and NFR verification|R|R||**A**|
+|Documentation|R|**A**|R|R|
+
+**A** = accountable owner, **R** = contributes.
+
+### 11.2 Rationale for Task Assignment
+
+Tasks were assigned by matching skills and interests: Reşat has embedded Linux and hardware experience, so he owns the RAPL and measurement parts and project management; Murat has the strongest backend experience, so he leads the CLI architecture and dashboard; Bülent focuses on requirements and documentation and builds the Budibase app to learn a low-code tool; Furkan owns testing and the k6 workload, which fits his interest in quality assurance. Each member also builds or tests part of a reference application so that everyone learns the low-code platforms. Total effort per person is within about 10% of the average (98 hours), which keeps the distribution fair.
+
+### 11.3 Clarity of Contribution on GitHub
+
+* Every member commits from their own GitHub account.
+* Commit messages follow the format `\\\[area] short description` (e.g., `\\\[rapl] add idle power sampler`).
+* Code is organized by module (`gsmf/measurement`, `gsmf/runner`, `gsmf/report`, `apps/`, `workload/`, `docs/`), so ownership matches folders.
+* Each Issue and Pull Request is assigned to its owner.
 ## 12\. Document-Specific Task Matrix
 
 |Task|Responsible|
