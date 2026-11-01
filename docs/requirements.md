@@ -60,6 +60,17 @@ This document lists the functional and non-functional requirements of GSMF, a CL
 
 ## 4\. Non-Functional Requirements
 
+| ID | Category | Requirement | Verification |
+|---|---|---|---|
+| NFR-1 | Reliability / measurement rigor | Before a run, the system must set the CPU governor to `performance`, disable Turbo Boost and refuse to start if these settings cannot be applied (unless an override flag is given). | Run log reports applied settings; failure case is tested. |
+| NFR-2 | Accuracy | The load generator must run on a separate machine from the testbed so that its CPU usage is not included in the energy readings. | Configuration validation rejects a load-generator address equal to the testbed. |
+| NFR-3 | Performance | The measurement process on the testbed must use less than 2% CPU on average during a run. | Measured with `pidstat` during a benchmark. |
+| NFR-4 | Reproducibility | A full benchmark must be reproducible from the repository README and configuration file without code changes; platform versions must be pinned in Compose files. | A team member who did not write the code runs the benchmark successfully. |
+| NFR-5 | Statistical quality | With default settings, the 95% confidence interval half-width of mean net energy should be below 10% of the mean for each target. | Checked in the summary report. |
+| NFR-6 | Usability | All main actions (run, report, export, dashboard) must be available as CLI commands with `--help` documentation. | Each command prints usage help. |
+| NFR-7 | Portability | The tool must run on Ubuntu 22.04 or 24.04 on Intel x86 hardware with RAPL support, and must report a clear error if RAPL is not available. | Tested on the testbed and on a machine without RAPL access. |
+| NFR-8 | Cost | The system must use only free or open-source software and require no paid services. | Dependency list review. |
+
 ## 5\. Document-Specific Task Matrix
 
 |Task|Responsible|
