@@ -98,7 +98,7 @@ The CLI is intended for technical users familiar with Linux, Docker and basic be
 | **Results Dashboard** | A simple interface for reviewing benchmark summaries and comparing energy consumption, execution time and derived metrics across the evaluated platforms. |
 | **Final Documentation and Presentation** | Documentation of the implemented system, its setup and usage, the experimental method and the findings, together with the final project presentation. |
 
-## 8. Budget and Resources
+## 8\. Budget and Resources
 
 * **Team:** Four members (roles listed in the Project Plan).
 * **Software (free/open source):** Python 3.11, FastAPI, SQLite, Docker and Docker Compose, Budibase and Appsmith community editions, k6, Scaphandre, Git/GitHub.
@@ -109,6 +109,15 @@ The CLI is intended for technical users familiar with Linux, Docker and basic be
 
 
 ## 9\. Risks and Mitigation Strategies
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| RAPL not available or blocked on the testbed hardware | Measurements impossible | Verify RAPL access in week 1; keep a second team machine as backup testbed |
+| Measurement noise from thermal throttling or background processes | Unreliable results | Fix CPU governor, disable Turbo Boost, cooldown between runs, headless OS, 10+ repetitions |
+| Building the same app on three platforms takes longer than planned | Schedule delay | Keep the reference app to three operations; build FastAPI baseline first |
+| Low-code platform setup or version issues in Docker | Blocked experiments | Pin platform versions in Compose files; document setup steps |
+| Team member unavailability | Lost capacity | Shared task matrix, pair ownership of critical modules, weekly status check |
+| Scope creep in the dashboard | Less time for measurement | CLI first; dashboard only after measurement pipeline is stable |
 
 
 
