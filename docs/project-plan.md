@@ -171,7 +171,39 @@ The project has no monetary cost; all software is free or open source and hardwa
 | Closure (presentation) | 16 | 4% |
 | **Total** | **392** | **100%** |
 
-## 10\. Effort Estimation
+## 10. Effort Estimation
+
+**Method:** Bottom-up estimation with expert judgment and analogy. Each phase was broken into tasks, each task was estimated by the member most familiar with it (based on similar coursework projects), and the estimates were discussed and adjusted as a team.
+
+### 10.1 Effort per Task
+
+| Phase | Task | Person-hours | Owner |
+|---|---|---|---|
+| Requirements and planning | Project documents for Assignment 1 | 40 | All (Reşat 12, Bülent 16, Murat 6, Furkan 6) |
+| Design | Architecture, app spec, experiment design | 48 | All (12 each) |
+| Development | Testbed setup and RAPL reader | 24 | Reşat |
+| Development | FastAPI reference app | 16 | Murat |
+| Development | Budibase reference app | 24 | Bülent |
+| Development | Appsmith reference app | 24 | Furkan |
+| Development | k6 workload scripts | 16 | Furkan |
+| Development | CLI runner and Docker lifecycle | 32 | Murat |
+| Development | Statistics, EDP and SCI module | 16 | Reşat |
+| Development | Storage, CSV export and reports | 16 | Bülent |
+| Development | Web dashboard | 24 | Murat |
+| Testing | Unit and integration tests | 24 | Bülent 12, Furkan 12 |
+| Testing | Benchmark runs and validation | 32 | Reşat 16, Furkan 16 |
+| Documentation | Final report, README, setup guide | 40 | All (10 each) |
+| Closure | Presentation preparation | 16 | All (4 each) |
+
+### 10.2 Effort per Person
+
+| Member | Person-hours |
+|---|---|
+| Reşat Efe Koca | 94 |
+| Bülent Çakır | 94 |
+| Murat Yılmaz | 104 |
+| Furkan Yaman | 100 |
+| **Total project effort** | **392** |
 
 ## 11\. Task Assignments
 
