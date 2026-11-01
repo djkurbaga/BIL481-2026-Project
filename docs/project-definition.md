@@ -98,8 +98,14 @@ The CLI is intended for technical users familiar with Linux, Docker and basic be
 | **Results Dashboard** | A simple interface for reviewing benchmark summaries and comparing energy consumption, execution time and derived metrics across the evaluated platforms. |
 | **Final Documentation and Presentation** | Documentation of the implemented system, its setup and usage, the experimental method and the findings, together with the final project presentation. |
 
-## 8\. Budget and Resources
+## 8. Budget and Resources
 
+* **Team:** Four members (roles listed in the Project Plan).
+* **Software (free/open source):** Python 3.11, FastAPI, SQLite, Docker and Docker Compose, Budibase and Appsmith community editions, k6, Scaphandre, Git/GitHub.
+* **Hardware:** One Intel-based x86 machine running Ubuntu as the testbed (a desktop or mini PC preferred; a laptop on AC power is the fallback), one team laptop as the load generator, and a local network switch or router.
+* **Learning resources:** Green Software Foundation SCI specification, Pereira et al. (2017), platform and tool documentation.
+* **Time:** One semester (October 2026 – January 2027).
+* **Budget:** No paid services are required; all tools are free or open source and run on team-owned hardware. Expected cost is 0 TL.
 
 
 ## 9\. Risks and Mitigation Strategies
