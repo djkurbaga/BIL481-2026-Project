@@ -1,0 +1,159 @@
+---
+config:
+  markdownAutoWrap: false
+---
+%% UML Sınıf Diyagramı — gsmf/models.py ve arayüz taslaklarının birebir imzaları
+classDiagram
+    direction LR
+
+    class PlatformKind {
+        <<enumeration>>
+        BUDIBASE = "budibase"
+        APPSMITH = "appsmith"
+        FASTAPI = "fastapi"
+    }
+    class StackState {
+        <<enumeration>>
+        STARTING
+        HEALTHY
+        RUNNING
+        STOPPING
+        STOPPED
+        FAILED
+    }
+    class RepetitionStatus {
+        <<enumeration>>
+        VALID
+        INVALID
+        FAILED
+    }
+
+    class TargetPlatform {
+        <<dataclass, frozen>>
+        +kind: PlatformKind
+        +compose_file: Path
+        +base_url: str
+        +health_url: str
+        +health_timeout_s: float = 120.0
+    }
+    class BenchmarkConfig {
+        <<dataclass, frozen>>
+        +title: str
+        +targets: tuple[TargetPlatform, ...]
+        +workload_size: int
+        +concurrency: int
+        +repetitions: int
+        +cooldown_s: float
+        +load_generator_host: str
+        +grid_carbon_intensity: float | None = None
+    }
+    class TestbedSettings {
+        <<dataclass, frozen>>
+        +hostname: str
+        +cpu_governor: str
+        +turbo_boost_disabled: bool
+        +rapl_domains: tuple[str, ...]
+    }
+    class RepetitionRecord {
+        <<dataclass, frozen>>
+        +run_id: str
+        +target: PlatformKind
+        +repetition_index: int
+        +status: RepetitionStatus
+        +reason: str | None = None
+        +idle_power_w: float | None = None
+        +gross_energy_j: float | None = None
+        +duration_s: float | None = None
+        +net_energy_j: float | None = None
+        +completed_tasks: int | None = None
+        +workload_errors: int = 0
+        +started_at: datetime | None = None
+    }
+    class EfficiencyMetrics {
+        <<dataclass, frozen>>
+        +run_id: str
+        +target: PlatformKind
+        +repetition_index: int
+        +net_energy_j: float
+        +duration_s: float
+        +completed_tasks: int
+        +energy_per_task_j: float
+        +edp_js: float
+        +energy_per_task_unit: str = "J/task"
+        +edp_unit: str = "J·s"
+    }
+
+    class config {
+        <<module · UC1>>
+        +load_config(path: Path) BenchmarkConfig
+        +validate_config(raw: Mapping[str, Any]) BenchmarkConfig
+    }
+    class StackManager {
+        <<UC2 · lifecycle>>
+        +state: StackState
+        +StackManager(compose_command: tuple[str, ...] = ("docker", "compose"))
+        +start(target: TargetPlatform) None
+        +wait_until_healthy(target: TargetPlatform, timeout_s: float) None
+        +mark_running() None
+        +stop(target: TargetPlatform) None
+    }
+    class lifecycle {
+        <<module · UC2>>
+        +isolated_stack(manager: StackManager, target: TargetPlatform) Iterator[StackManager]
+    }
+    class metrics {
+        <<module · UC3>>
+        +energy_per_task(net_energy_j: float, completed_tasks: int) float
+        +energy_delay_product(net_energy_j: float, duration_s: float) float
+        +skip_reason(record: RepetitionRecord) str | None
+        +compute_repetition_metrics(record: RepetitionRecord) EfficiencyMetrics | None
+        +compute_metrics(records: Iterable[RepetitionRecord]) list[EfficiencyMetrics]
+    }
+    class ResultStore {
+        <<UC4 · storage>>
+        +ResultStore(db_path: Path)
+        +initialize_schema() None
+        +save_run(run_id: str, config: BenchmarkConfig, target_versions: Mapping[PlatformKind, str], testbed: TestbedSettings) None
+        +save_repetition(record: RepetitionRecord) None
+        +save_metrics(metrics: Iterable[EfficiencyMetrics]) None
+        +load_repetitions(run_id: str) list[RepetitionRecord]
+        +export_raw_csv(run_id: str, out_path: Path) Path
+        +export_aggregates_csv(run_id: str, out_path: Path) Path
+    }
+
+    class GSMFError {
+        <<exception>>
+    }
+    class ConfigError {
+        <<exception>>
+    }
+    class ExecutionFailure {
+        <<exception>>
+    }
+    class StorageError {
+        <<exception>>
+    }
+
+    GSMFError <|-- ConfigError
+    GSMFError <|-- ExecutionFailure
+    GSMFError <|-- StorageError
+
+    BenchmarkConfig "1" *-- "1..*" TargetPlatform : targets
+    TargetPlatform --> PlatformKind : kind
+    RepetitionRecord --> PlatformKind : target
+    RepetitionRecord --> RepetitionStatus : status
+    EfficiencyMetrics --> PlatformKind : target
+    StackManager --> StackState : state
+
+    config ..> BenchmarkConfig : creates
+    config ..> ConfigError : raises
+    StackManager ..> TargetPlatform : manages
+    StackManager ..> ExecutionFailure : raises
+    lifecycle ..> StackManager : uses
+    metrics ..> RepetitionRecord : reads
+    metrics ..> EfficiencyMetrics : creates
+    ResultStore ..> RepetitionRecord : persists
+    ResultStore ..> EfficiencyMetrics : persists
+    ResultStore ..> BenchmarkConfig : persists
+    ResultStore ..> TestbedSettings : persists
+    ResultStore ..> StorageError : raises

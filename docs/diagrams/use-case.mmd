@@ -1,0 +1,36 @@
+%% UML Kullanım Senaryosu Diyagramı — GSMF (UC1–UC4)
+%% Mermaid'de yerel use-case diyagramı olmadığı için flowchart ile çizilmiştir.
+%% Gri kesikli senaryo bağlam içindir (FR-4–FR-7), bu ödevin kapsamında değildir.
+flowchart LR
+    researcher["Researcher<br/>«primary actor»"]
+    docker["Docker Engine<br/>«system actor»"]
+    loadgen["Load Generator<br/>(k6 on a separate host)<br/>«system actor»"]
+
+    subgraph GSMF["GSMF — Green Software Metrics Framework"]
+        direction TB
+        UC1(["UC1 Configure benchmark<br/>(FR-1)"])
+        UCX(["Execute benchmark repetition<br/>(FR-4 – FR-7, context)"])
+        UC2(["UC2 Manage isolated stack lifecycle<br/>(FR-3)"])
+        UC3(["UC3 Compute efficiency metrics<br/>(FR-8)"])
+        UC4(["UC4 Persist and export results<br/>(FR-11)"])
+    end
+
+    researcher --- UC1
+    researcher --- UCX
+    researcher --- UC3
+    researcher --- UC4
+
+    UCX -. "«include»" .-> UC1
+    UCX -. "«include»" .-> UC2
+    UCX -. "«include»" .-> UC4
+    UC3 -. "«include»" .-> UC4
+
+    UC2 --- docker
+    UCX --- loadgen
+
+    classDef actor fill:#fff,stroke:#333,stroke-width:2px;
+    classDef uc fill:#e6f2ff,stroke:#1f5fa8;
+    classDef ctx fill:#f4f4f4,stroke:#999,stroke-dasharray:4 3,color:#555;
+    class researcher,docker,loadgen actor;
+    class UC1,UC2,UC3,UC4 uc;
+    class UCX ctx;

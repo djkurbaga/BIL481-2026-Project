@@ -1,0 +1,41 @@
+%% UML Aktivite Diyagramı — tek bir tam kıyaslama tekrarı
+flowchart TD
+    S((start)) --> A1["start(target)<br/>docker compose up -d"]
+    A1 --> D1{"compose up ok?"}
+    D1 -- no --> F1["status = FAILED<br/>reason = startup failure"]
+    D1 -- yes --> A2["wait_until_healthy(target, timeout_s)"]
+    A2 --> D2{"healthy before timeout?"}
+    D2 -- no --> F2["status = FAILED<br/>reason = health check timeout"]
+    D2 -- yes --> A3["Measure idle RAPL energy over idle interval<br/>idle_power_w = idle energy / interval"]
+    A3 --> D3{"counters readable and<br/>interval > 0?"}
+    D3 -- no --> I1["status = INVALID<br/>reason = idle measurement unusable"]
+    D3 -- yes --> A4["mark_running()<br/>read RAPL start, trigger k6 on load generator"]
+    A4 --> D4{"k6 run succeeded?"}
+    D4 -- no --> F3["status = FAILED<br/>reason = remote workload failure"]
+    D4 -- yes --> A5["Read RAPL end, handle wraparound<br/>gross_energy_j, duration_s, completed_tasks"]
+    A5 --> A6["net_energy_j = gross_energy_j − idle_power_w × duration_s"]
+    A6 --> D5{"net_energy_j ≥ 0 and<br/>completed_tasks > 0?"}
+    D5 -- no --> I2["status = INVALID<br/>reason = negative net energy / zero tasks"]
+    D5 -- yes --> V["status = VALID"]
+    V --> M["UC3: energy_per_task_j = net / tasks [J/task]<br/>edp_js = net × duration [J·s]"]
+
+    F1 --> P
+    F2 --> P
+    F3 --> P
+    I1 --> P
+    I2 --> P
+    M --> P["UC4: save_repetition(record)<br/>(+ save_metrics if VALID)"]
+
+    P --> A7["stop(target)<br/>docker compose down + verify"]
+    A7 --> D6{"shutdown confirmed?"}
+    D6 -- no --> X["raise ExecutionFailure<br/>abort run, do not start next stack"]
+    D6 -- yes --> A8["sleep(cooldown_s)"]
+    A8 --> E((end))
+    X --> E
+
+    classDef fail fill:#fde8e8,stroke:#c0392b;
+    classDef inv fill:#fff4e0,stroke:#d68910;
+    classDef ok fill:#e8f8ec,stroke:#1e8449;
+    class F1,F2,F3,X fail;
+    class I1,I2 inv;
+    class V,M ok;

@@ -1,0 +1,32 @@
+%% UML Sıralama Diyagramı — UC1 Kıyaslamayı yapılandır (FR-1)
+sequenceDiagram
+    autonumber
+    actor R as Researcher
+    participant CLI as gsmf CLI
+    participant CFG as config
+    participant FS as YAML file
+    participant LC as lifecycle (UC2)
+
+    R->>CLI: gsmf run --config suite.yaml
+    CLI->>CFG: load_config(path: Path)
+    CFG->>FS: read and parse YAML
+    alt file missing or YAML malformed
+        FS-->>CFG: error
+        CFG-->>CLI: raise ConfigError("cannot read ...")
+    else file read
+        FS-->>CFG: raw: Mapping[str, Any]
+        CFG->>CFG: validate_config(raw)
+        Note right of CFG: required fields present?<br/>targets in PlatformKind?<br/>workload_size, concurrency, repetitions > 0?<br/>cooldown_s >= 0?
+        alt any rule violated
+            CFG-->>CLI: raise ConfigError(explanatory message)
+        else all rules pass
+            CFG-->>CLI: BenchmarkConfig
+        end
+    end
+    alt ConfigError
+        CLI-->>R: print error, exit code != 0
+        Note over CLI,LC: No platform stack is started
+    else valid config
+        CLI->>LC: continue with first target (UC2)
+        CLI-->>R: "configuration valid"
+    end
