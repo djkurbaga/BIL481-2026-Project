@@ -9,8 +9,7 @@ import csv
 import json
 import sqlite3
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-
+from pathlib import Path, PureWindowsPath
 import pytest
 
 from gsmf.metrics import compute_metrics, compute_repetition_metrics, load_records_csv
@@ -155,6 +154,28 @@ def test_save_run_stores_config_versions_and_testbed(store: ResultStore):
         (1, "fastapi", "0.115.0", "apps/fastapi/docker-compose.yml", 60.0),
         (2, "budibase", "3.2.1", "apps/budibase/docker-compose.yml", 60.0),
     ]
+
+def test_compose_path_stored_with_forward_slashes(tmp_path: Path):
+    """Windows yolu (ters eğik çizgi) her işletim sisteminde "/" ayracıyla saklanır."""
+    target = TargetPlatform(
+        kind=PlatformKind.FASTAPI,
+        compose_file=PureWindowsPath(r"apps\fastapi\docker-compose.yml"),
+        base_url="http://fastapi.local",
+        health_url="http://fastapi.local/health",
+    )
+    config = BenchmarkConfig(
+        title="windows", targets=(target,), workload_size=1, concurrency=1,
+        repetitions=1, cooldown_s=0.0, load_generator_host="loadgen",
+    )
+    s = ResultStore(tmp_path / "w.db")
+    s.initialize_schema()
+    s.save_run("w", config, {PlatformKind.FASTAPI: "1"}, TESTBED)
+    with sqlite3.connect(s.db_path) as conn:
+        stored = conn.execute("SELECT compose_file FROM run_targets").fetchone()[0]
+        config_json = json.loads(conn.execute("SELECT config_json FROM runs").fetchone()[0])
+    conn.close()
+    assert stored == "apps/fastapi/docker-compose.yml"
+    assert config_json["targets"][0]["compose_file"] == "apps/fastapi/docker-compose.yml"
 
 
 def test_save_run_rejects_duplicate_run_id(store: ResultStore):

@@ -31,7 +31,7 @@ from contextlib import contextmanager
 from dataclasses import asdict
 from datetime import datetime, timezone
 from enum import Enum
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any
 
 from gsmf.models import (
@@ -176,8 +176,8 @@ def _to_jsonable(value: Any) -> Any:
     """Dataclass alanlarını JSON'a yazılabilir türlere (Path→str, Enum→değer) çevirir."""
     if isinstance(value, Enum):
         return value.value
-    if isinstance(value, Path):
-        return str(value)
+    if isinstance(value, PurePath):
+        return value.as_posix()
     if isinstance(value, Mapping):
         return {str(k): _to_jsonable(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
@@ -403,7 +403,7 @@ class ResultStore:
                         position,
                         target.kind.value,
                         target_versions[target.kind],
-                        str(target.compose_file),
+                        PurePath(target.compose_file).as_posix(),
                         target.base_url,
                         target.health_url,
                         target.health_timeout_s,

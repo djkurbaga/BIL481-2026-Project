@@ -16,6 +16,7 @@ değildir. Süreler yerel makineye özgüdür, genel bir hız sıralaması deği
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import platform
 import random
@@ -117,7 +118,7 @@ def sqlite_read(path: Path) -> list[RepetitionRecord]:
 def sqlite_tamper(path: Path) -> str:
     """Saklanan bir net enerji değerini doğrudan SQL ile değiştirmeyi dener."""
     try:
-        with sqlite3.connect(path) as conn:
+        with contextlib.closing(sqlite3.connect(path)) as conn, conn:
             conn.execute("UPDATE repetitions SET net_energy_j = 0 WHERE id = 1")
         return "değiştirildi"
     except sqlite3.DatabaseError as exc:
