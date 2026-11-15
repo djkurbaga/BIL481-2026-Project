@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="960" height="420" fill="#ffffff"/>
+  <text x="24" y="34" font-size="20" font-weight="bold" fill="#222">Wireframe 1 — CLI validation error (UC1, FR-1)</text>
+  <!-- terminal -->
+  <rect x="24" y="56" width="640" height="300" rx="8" fill="#f4f4f4" stroke="#555" stroke-width="2"/>
+  <rect x="24" y="56" width="640" height="28" rx="8" fill="#ddd" stroke="#555" stroke-width="2"/>
+  <circle cx="44" cy="70" r="5" fill="#999"/><circle cx="62" cy="70" r="5" fill="#999"/><circle cx="80" cy="70" r="5" fill="#999"/>
+  <text x="300" y="75" font-size="13" fill="#444">Terminal</text>
+  <g font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#222">
+    <text x="40" y="112">$ gsmf run experiments/bad.yaml</text>
+    <text x="40" y="140" font-weight="bold">error: invalid configuration (experiments/bad.yaml)</text>
+    <text x="40" y="162">&#160;&#160;targets[0].kind: desteklenmeyen hedef 'bubble';</text>
+    <text x="40" y="182">&#160;&#160;desteklenenler: budibase, appsmith, fastapi</text>
+    <text x="40" y="214">No Docker stack was started. Fix the field and run again.</text>
+    <text x="40" y="246">$ echo $?</text>
+    <text x="40" y="268">1</text>
+    <text x="40" y="300">$ ▌</text>
+  </g>
+  <!-- annotations -->
+  <g font-size="13" fill="#222">
+    <rect x="690" y="120" width="250" height="56" fill="#fff" stroke="#888" stroke-dasharray="5 4"/>
+    <text x="700" y="142">Field path + reason, from</text>
+    <text x="700" y="162">ConfigError message</text>
+    <line x1="690" y1="150" x2="560" y2="168" stroke="#888" stroke-width="1.5"/>
+    <rect x="690" y="196" width="250" height="56" fill="#fff" stroke="#888" stroke-dasharray="5 4"/>
+    <text x="700" y="218">Validation runs before any</text>
+    <text x="700" y="238">stack starts</text>
+    <line x1="690" y1="224" x2="520" y2="210" stroke="#888" stroke-width="1.5"/>
+    <rect x="690" y="272" width="250" height="40" fill="#fff" stroke="#888" stroke-dasharray="5 4"/>
+    <text x="700" y="297">Non-zero exit code</text>
+    <line x1="690" y1="292" x2="60" y2="264" stroke="#888" stroke-width="1.5"/>
+  </g>
+  <text x="24" y="396" font-size="12" fill="#666">Low-fidelity wireframe. Error text matches the current gsmf.config message; the "gsmf run" command is planned.</text>
+</svg>

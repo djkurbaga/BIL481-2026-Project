@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="960" height="480" fill="#ffffff"/>
+  <text x="24" y="34" font-size="20" font-weight="bold" fill="#222">Wireframe 3 — CSV export result (UC4, FR-11)</text>
+  <rect x="24" y="56" width="912" height="250" rx="8" fill="#f4f4f4" stroke="#555" stroke-width="2"/>
+  <rect x="24" y="56" width="912" height="28" rx="8" fill="#ddd" stroke="#555" stroke-width="2"/>
+  <circle cx="44" cy="70" r="5" fill="#999"/><circle cx="62" cy="70" r="5" fill="#999"/><circle cx="80" cy="70" r="5" fill="#999"/>
+  <text x="450" y="75" font-size="13" fill="#444">Terminal</text>
+  <g font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#222">
+    <text x="40" y="112">$ gsmf export --run-id RUN_ID --out results/</text>
+    <text x="40" y="140">✓ raw records&#160;&#160;&#160;→ results/raw_RUN_ID.csv&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;(N rows: n valid, n invalid, n failed)</text>
+    <text x="40" y="162">✓ aggregates&#160;&#160;&#160;&#160;→ results/aggregates_RUN_ID.csv&#160;&#160;(one row per target)</text>
+    <text x="40" y="194">$ gsmf export --run-id unknown --out results/</text>
+    <text x="40" y="216" font-weight="bold">error: run_id bulunamadı: 'unknown'</text>
+    <text x="40" y="238">No file was written.</text>
+    <text x="40" y="270">$ ▌</text>
+  </g>
+  <!-- file previews -->
+  <g font-size="13" fill="#222">
+    <rect x="24" y="322" width="448" height="120" fill="#fff" stroke="#555" stroke-width="1.5"/>
+    <rect x="24" y="322" width="448" height="24" fill="#e8e8e8" stroke="#555" stroke-width="1.5"/>
+    <text x="34" y="339" font-weight="bold">raw_RUN_ID.csv</text>
+    <g font-family="DejaVu Sans Mono, monospace" font-size="11">
+      <text x="34" y="364">run_id,target,repetition_index,status,reason,</text>
+      <text x="34" y="380">idle_power_w,…,net_energy_j,completed_tasks,…</text>
+      <text x="34" y="400">RUN_ID,fastapi,1,valid,,x.x,…,x.x,nnnn,…</text>
+      <text x="34" y="416">RUN_ID,fastapi,3,failed,&lt;reason&gt;,,,,,…</text>
+    </g>
+    <rect x="488" y="322" width="448" height="120" fill="#fff" stroke="#555" stroke-width="1.5"/>
+    <rect x="488" y="322" width="448" height="24" fill="#e8e8e8" stroke="#555" stroke-width="1.5"/>
+    <text x="498" y="339" font-weight="bold">aggregates_RUN_ID.csv</text>
+    <g font-family="DejaVu Sans Mono, monospace" font-size="11">
+      <text x="498" y="364">run_id,target,target_version,repetitions_total,</text>
+      <text x="498" y="380">valid_count,…,energy_per_task_j_mean,…,edp_unit</text>
+      <text x="498" y="400">RUN_ID,fastapi,&lt;version&gt;,n,n,n,n,n,x.x,…,J·s</text>
+    </g>
+  </g>
+  <text x="24" y="466" font-size="12" fill="#666">Low-fidelity wireframe. Column names and the error text match gsmf/storage.py; the "gsmf export" command is planned.</text>
+</svg>
