@@ -281,3 +281,65 @@ def test_compose_poll_is_bounded_by_health_deadline(manager, target, clock):
     with pytest.raises(ExecutionFailure, match="Komut"):
         manager.wait_until_healthy(target, 0.1)
     assert runner.calls[-1][1]["timeout"] == 0.1
+
+
+def test_context_cleans_up_normal_exit(manager, target, healthy_http):
+    manager.runner = FakeRunner("", RUNNING, "", "")
+    with isolated_stack(manager, target) as current:
+        assert current is manager
+        assert manager.state is StackState.HEALTHY
+        manager.mark_running()
+    assert manager.state is StackState.STOPPED
+
+
+def test_context_cleans_up_workload_failure(manager, target, healthy_http):
+    manager.runner = FakeRunner("", RUNNING, "", "")
+    with pytest.raises(RuntimeError, match="iş yükü"):
+        with isolated_stack(manager, target):
+            raise RuntimeError("iş yükü başarısız")
+    assert manager.state is StackState.STOPPED
+
+
+@pytest.mark.parametrize("responses", [
+    [subprocess.CompletedProcess("up", 1, "", "kısmi başlatma"), "", ""],
+    ["", "[]", "", ""],
+])
+def test_context_cleans_up_start_and_health_failure(manager, target, responses):
+    runner = FakeRunner(*responses)
+    manager.runner = runner
+    with pytest.raises(ExecutionFailure):
+        with isolated_stack(manager, target):
+            pytest.fail("Başarısız yığında iş yüküne geçilmemeli")
+    assert runner.calls[-2][0][-2:] == ["down", "--remove-orphans"]
+    assert manager.state is StackState.STOPPED
+
+
+def test_cleanup_failure_preserves_original_exception(manager, target, healthy_http):
+    manager.runner = FakeRunner(
+        "", RUNNING, subprocess.CompletedProcess("down", 1, "", "kapanış hatası"),
+    )
+    with pytest.raises(ExecutionFailure, match="kapanış hatası") as caught:
+        with isolated_stack(manager, target):
+            raise RuntimeError("asıl iş yükü hatası")
+    assert isinstance(caught.value.__context__, RuntimeError)
+    assert manager.state is StackState.FAILED
+
+
+def test_nested_context_does_not_stop_outer_stack(manager, target, healthy_http):
+    runner = FakeRunner("", RUNNING, "", "")
+    manager.runner = runner
+    with isolated_stack(manager, target):
+        with pytest.raises(ExecutionFailure, match="boş"):
+            with isolated_stack(manager, target):
+                pytest.fail("İç içe yığın açılmamalı")
+        assert len(runner.calls) == 2
+        assert manager.state is StackState.HEALTHY
+    assert manager.state is StackState.STOPPED
+
+
+def test_context_cleans_up_keyboard_interrupt(manager, target, healthy_http):
+    manager.runner = FakeRunner("", RUNNING, "", "")
+    with pytest.raises(KeyboardInterrupt):
+        with isolated_stack(manager, target):
+            raise KeyboardInterrupt
+    assert manager.state is StackState.STOPPED
