@@ -1,0 +1,53 @@
+%% UML Bileşen Diyagramı — katmanlı mimari (CLI → servisler → depolama/altyapı)
+%% Mavi bileşenler UC1–UC4'tür; kesikli bileşenler planlanmıştır (bu ödevin kapsamı dışında).
+flowchart TB
+    subgraph L1["Presentation layer"]
+        CLI["«component»<br/>gsmf CLI<br/>(run · metrics · export)"]
+    end
+
+    subgraph L2["Service layer"]
+        CFG["«component»<br/>config<br/>UC1 · FR-1"]
+        RUN["«component»<br/>runner<br/>FR-4 (planned)"]
+        LIFE["«component»<br/>lifecycle<br/>UC2 · FR-3"]
+        MEAS["«component»<br/>measurement (RAPL)<br/>FR-5, FR-7 (planned)"]
+        WORK["«component»<br/>workload client (k6)<br/>FR-6 (planned)"]
+        MET["«component»<br/>metrics<br/>UC3 · FR-8"]
+    end
+
+    subgraph L3["Storage and infrastructure layer"]
+        STORE["«component»<br/>storage<br/>UC4 · FR-11"]
+        DB[("SQLite<br/>results.db")]
+        CSV[/"CSV exports"/]
+        YAML[/"YAML config file"/]
+        DOCKER["«external»<br/>Docker Engine (Compose)"]
+        RAPL["«external»<br/>Linux RAPL sysfs"]
+        K6["«external»<br/>Load Generator (k6 host)"]
+    end
+
+    MODELS{{"«library» gsmf.models<br/>shared dataclasses and enums"}}
+
+    CLI --> CFG
+    CLI --> RUN
+    CLI --> MET
+    CLI --> STORE
+    RUN --> LIFE
+    RUN --> MEAS
+    RUN --> WORK
+    RUN --> MET
+    RUN --> STORE
+    CFG --> YAML
+    LIFE --> DOCKER
+    MEAS --> RAPL
+    WORK --> K6
+    STORE --> DB
+    STORE --> CSV
+
+    CFG -.-> MODELS
+    LIFE -.-> MODELS
+    MET -.-> MODELS
+    STORE -.-> MODELS
+
+    classDef planned stroke-dasharray:5 4,fill:#f7f7f7,color:#555;
+    classDef uc fill:#e6f2ff,stroke:#1f5fa8;
+    class RUN,MEAS,WORK planned;
+    class CFG,LIFE,MET,STORE uc;
