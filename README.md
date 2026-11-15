@@ -254,3 +254,32 @@ export. The CSV row uses `gsmf.metrics.load_records_csv`, which does not read
 
 Wireframes for the CLI, CSV export and dashboard are in
 [docs/wireframes/](docs/wireframes/README.md).
+
+## QA plan and configuration comparison
+
+The [QA plan](docs/qa-plan.md) documents scope, measurable quality targets,
+nine detailed automated cases, manual checks, issue workflow and task ownership.
+
+```bash
+python -m pip install -r comparisons/requirements.txt
+python -m pytest -q
+python comparisons/config_manual_vs_pydantic.py --iterations 1000 --repeats 5
+```
+
+[Recorded output, 15 November 2026](comparisons/results/config-2026-11-15.jsonl):
+Python 3.12.14, Linux x86_64, Pydantic 2.13.4. All **62 synthetic cases** matched
+their expected acceptance decisions in both implementations, with **0 mismatches**
+and equal dataclass outputs on accepted input. Error text is recorded separately;
+manual validation stops at its first error, while Pydantic can collect multiple errors.
+
+| Validator | Median seconds per 1,000 valid-input validations (5 repeats) |
+|---|---:|
+| Existing manual validator | 0.005993 |
+| Independent Pydantic schema + dataclass conversion | 0.006514 |
+
+Timings include conversion to the same `BenchmarkConfig`, exclude YAML/file I/O,
+imports and schema construction, and alternate execution order. This small local
+sample is not a general speed ranking or energy measurement. Pydantic needs
+explicit validators to retain strict counts, finite numbers and existing URL/path
+rules; the corpus demonstrates tested compatibility, not universal equivalence.
+Production configuration validation is unchanged.
