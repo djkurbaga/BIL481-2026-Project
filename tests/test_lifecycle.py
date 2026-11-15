@@ -135,3 +135,83 @@ def test_stop_is_idempotent(manager, target):
     manager.stop(target)
     manager.stop(target)
     assert len(runner.calls) == 3
+
+
+@pytest.mark.parametrize("failure", [
+    FileNotFoundError("docker bulunamadı"),
+    subprocess.TimeoutExpired("docker", 1),
+    subprocess.CompletedProcess("docker", 1, "", "başlatma hatası"),
+])
+def test_start_failure_blocks_next_target_until_cleanup(manager, target, failure):
+    runner = FakeRunner(failure, "", "", "")
+    manager.runner = runner
+    with pytest.raises(ExecutionFailure, match="Komut"):
+        manager.start(target)
+    assert manager.state is StackState.FAILED
+    with pytest.raises(ExecutionFailure, match="kapanışı"):
+        manager.start(replace(target, kind=PlatformKind.APPSMITH))
+    assert len(runner.calls) == 1
+    manager.stop(target)
+    manager.start(target)
+    assert manager.state is StackState.STARTING
+
+
+@pytest.mark.parametrize("responses", [
+    [subprocess.CompletedProcess("down", 1, "", "kapatılamadı")],
+    ["", "kalan-konteyner\n"],
+    ["", subprocess.TimeoutExpired("ps", 1)],
+    ["", subprocess.CompletedProcess("ps", 1, "", "erişim reddedildi")],
+])
+def test_shutdown_failure_blocks_next_target(manager, target, responses):
+    runner = FakeRunner("", *responses)
+    manager.runner = runner
+    manager.start(target)
+    with pytest.raises(ExecutionFailure):
+        manager.stop(target)
+    assert manager.state is StackState.FAILED
+    count = len(runner.calls)
+    with pytest.raises(ExecutionFailure, match="kapanışı"):
+        manager.start(replace(target, kind=PlatformKind.APPSMITH))
+    assert len(runner.calls) == count
+
+
+@pytest.mark.parametrize("output", [
+    "", "[]", '[{"State":"exited"}]', '[{"State":"dead"}]',
+    '[{"State":"running","Health":"unhealthy"}]',
+    'bozuk JSON', '{}', 'null', '[42]',
+])
+def test_crashed_or_unreadable_stack_fails(manager, target, output, healthy_http):
+    manager.runner = FakeRunner("", output)
+    manager.start(target)
+    with pytest.raises(ExecutionFailure):
+        manager.wait_until_healthy(target, 1)
+    assert manager.state is StackState.FAILED
+    assert healthy_http == []
+
+
+def test_wrong_target_cannot_stop_active_stack(manager, target):
+    runner = FakeRunner("", "", "")
+    manager.runner = runner
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="eşleşmiyor"):
+        manager.stop(replace(target, kind=PlatformKind.APPSMITH))
+    assert len(runner.calls) == 1
+    manager.stop(target)
+    assert manager.state is StackState.STOPPED
+
+
+def test_mark_running_requires_health(manager, target):
+    manager.runner = FakeRunner("")
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="HEALTHY"):
+        manager.mark_running()
+    assert manager.state is StackState.FAILED
+
+
+def test_double_start_does_not_issue_another_command(manager, target):
+    runner = FakeRunner("")
+    manager.runner = runner
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="kapanışı"):
+        manager.start(target)
+    assert len(runner.calls) == 1
