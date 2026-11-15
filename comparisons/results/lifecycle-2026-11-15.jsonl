@@ -1,0 +1,7 @@
+{"environment": {"recorded_at": "2026-11-15T13:12:42.838412+00:00", "host": "macOS-27.0.1-arm64-arm-64bit-Mach-O", "python": "3.14.5", "compose": "5.1.4", "engine": "29.4.3", "sdk": "7.2.0", "image_id": "sha256:3ad942acaeeb684d54740825b2885a82ae292612f9e659965715eed103a1fe12", "build_included": false}}
+{"repetition": 1, "backend": "subprocess_compose", "status": "ok", "shutdown_confirmed": true, "start_s": 0.146853, "health_s": 5.338323, "stop_s": 0.693934, "total_s": 6.179146}
+{"repetition": 1, "backend": "docker_sdk", "status": "ok", "shutdown_confirmed": true, "start_s": 0.082218, "health_s": 5.191689, "stop_s": 0.442729, "total_s": 5.716658}
+{"repetition": 2, "backend": "docker_sdk", "status": "ok", "shutdown_confirmed": true, "start_s": 0.07138, "health_s": 5.199662, "stop_s": 0.449067, "total_s": 5.720124}
+{"repetition": 2, "backend": "subprocess_compose", "status": "ok", "shutdown_confirmed": true, "start_s": 0.148193, "health_s": 5.340636, "stop_s": 0.683482, "total_s": 6.17235}
+{"repetition": 3, "backend": "subprocess_compose", "status": "ok", "shutdown_confirmed": true, "start_s": 0.161231, "health_s": 5.329862, "stop_s": 0.692762, "total_s": 6.183902}
+{"repetition": 3, "backend": "docker_sdk", "status": "ok", "shutdown_confirmed": true, "start_s": 0.089817, "health_s": 5.217853, "stop_s": 0.463228, "total_s": 5.770919}
