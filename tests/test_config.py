@@ -141,3 +141,43 @@ def test_invalid_compose_path(raw_config, value):
     raw_config["targets"][0]["compose_file"] = value
     with pytest.raises(ConfigError, match="compose_file"):
         validate_config(raw_config)
+
+
+def test_load_resolves_paths_relative_to_yaml(raw_config, tmp_path, monkeypatch):
+    config_dir = tmp_path / "examples"
+    config_dir.mkdir()
+    path = config_dir / "benchmark.yaml"
+    path.write_text(yaml.safe_dump(raw_config), encoding="utf-8")
+    monkeypatch.chdir(tmp_path.parent)
+    config = load_config(path)
+    assert config.targets[0].compose_file == tmp_path / "apps/fastapi-baseline/docker-compose.yml"
+    assert config.title == "UC1 deneyi"
+
+
+def test_load_preserves_absolute_path(raw_config, tmp_path):
+    raw_config["targets"][0]["compose_file"] = str(tmp_path / "compose.yml")
+    path = tmp_path / "benchmark.yaml"
+    path.write_text(yaml.safe_dump(raw_config), encoding="utf-8")
+    assert load_config(path).targets[0].compose_file == tmp_path / "compose.yml"
+
+
+@pytest.mark.parametrize("contents", ["", "[", "- fastapi", "!!python/object:builtins.object {}"])
+def test_bad_yaml(tmp_path, contents):
+    path = tmp_path / "bad.yaml"
+    path.write_text(contents, encoding="utf-8")
+    with pytest.raises(ConfigError):
+        load_config(path)
+
+
+def test_unreadable_file(tmp_path):
+    with pytest.raises(ConfigError, match="okunamadı"):
+        load_config(tmp_path / "missing.yaml")
+    with pytest.raises(ConfigError, match="okunamadı"):
+        load_config(tmp_path)
+
+
+def test_invalid_utf8(tmp_path):
+    path = tmp_path / "bad.yaml"
+    path.write_bytes(b"\xff")
+    with pytest.raises(ConfigError, match="okunamadı"):
+        load_config(path)
