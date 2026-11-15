@@ -269,11 +269,12 @@ def load_records_csv(path: Path) -> list[RepetitionRecord]:
 # ---------------------------------------------------------------------------
 
 
-def format_table(records: Sequence[RepetitionRecord]) -> str:
+def format_table(records: Sequence[RepetitionRecord], edp_unit: str = UNIT_EDP) -> str:
     """Her kayıt için metrik veya atlanma sebebini içeren metin tablosu üretir.
 
     Args:
         records: Tabloya yazılacak tekrar kayıtları.
+        edp_unit: Başlıkta gösterilecek EDP birimi (konsol "·" yazamıyorsa "J*s").
 
     Returns:
         Terminalde yazdırılmaya hazır çok satırlı metin.
@@ -286,7 +287,7 @@ def format_table(records: Sequence[RepetitionRecord]) -> str:
         f"Duration ({UNIT_DURATION})",
         "Tasks",
         f"Energy/task ({UNIT_ENERGY_PER_TASK})",
-        f"EDP ({UNIT_EDP})",
+        f"EDP ({edp_unit})",
         "Note",
     ]
     rows: list[list[str]] = []
@@ -360,9 +361,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("csv_path", type=Path, help="CSV file with repetition records")
     args = parser.parse_args(argv)
 
-    # Windows konsolunda "·" gibi karakterler yazdırılamazsa çökme yerine değiştir.
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(errors="replace")
+    # Konsol kodlaması "·" karakterini yazamıyorsa (ör. Windows cp1254) ASCII birim kullan.
+    encoding = getattr(sys.stdout, "encoding", None) or "ascii"
+    try:
+        UNIT_EDP.encode(encoding)
+        edp_label = UNIT_EDP
+    except (UnicodeEncodeError, LookupError):
+        edp_label = "J*s"
 
     # Dosyayı oku; okunamazsa anlaşılır bir hata ile çık.
     try:
@@ -373,7 +378,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # Tabloyu ve kısa bir özet satırını yazdır.
     valid = compute_metrics(records)
-    print(format_table(records))
+    print(format_table(records, edp_unit=edp_label))
     print()
     print(
         f"{len(valid)} of {len(records)} repetitions used for metrics; "

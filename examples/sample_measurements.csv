@@ -1,0 +1,12 @@
+# ILLUSTRATIVE SAMPLE DATA - NOT REAL MEASUREMENTS. Values are invented for the UC3 demo and tests only.
+# net_energy_j = gross_energy_j - idle_power_w * duration_s. Includes one failed, one zero-task and one negative-net-energy repetition.
+run_id,target,repetition_index,status,reason,idle_power_w,gross_energy_j,duration_s,net_energy_j,completed_tasks,workload_errors
+demo-run,fastapi,1,valid,,12.0,635.2,18.1,418.0,1000,0
+demo-run,fastapi,2,valid,,12.1,640.0,18.4,417.36,1000,0
+demo-run,fastapi,3,failed,k6 remote execution failed,,,,,,
+demo-run,appsmith,1,valid,,14.0,1748.0,33.4,1280.4,1000,0
+demo-run,appsmith,2,valid,,14.2,1760.5,33.9,1279.12,998,2
+demo-run,appsmith,3,invalid,zero completed user tasks,14.1,120.3,5.2,46.98,0,1000
+demo-run,budibase,1,valid,,15.0,2510.1,43.2,1862.1,1000,0
+demo-run,budibase,2,invalid,negative net energy,15.3,600.0,41.0,-27.3,1000,0
+demo-run,budibase,3,valid,,15.1,2530.0,43.6,1871.64,1000,0
