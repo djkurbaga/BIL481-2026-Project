@@ -148,3 +148,109 @@ further runs when shutdown cannot be confirmed.
 The implementation follows Docker's documented
 [Compose container status output](https://docs.docker.com/reference/cli/docker/compose/ps/)
 and [SDK container lifecycle API](https://docker-py.readthedocs.io/en/stable/containers.html).
+
+## UC4 — result persistence and CSV export (FR-11)
+
+`gsmf/storage.py` (`ResultStore`) writes everything to one SQLite file:
+
+- `runs`: configuration (scalar columns plus the full config as JSON) and testbed settings
+- `run_targets`: each target in config order, with its version, Compose file and URLs
+- `repetitions`: every repetition, **including failed and invalid ones**, with status and reason
+- `metrics`: computed FR-8 metrics, kept separate from the raw records
+
+The store only inserts rows. Duplicate runs, repetitions or metrics raise
+`StorageError`. SQLite triggers reject every `UPDATE`/`DELETE` on all four
+tables, so stored measured values cannot be changed later. INVALID/FAILED
+records need a non-empty `reason`. NaN is rejected because SQLite would store it
+as NULL; save an unreadable value as `None` and put the cause in `reason`.
+Metrics are only accepted for stored VALID repetitions whose net energy, duration
+and task count match the stored values.
+
+Exports for a selected run (an `out_path` that does not end in `.csv` is used as
+a directory and created if needed):
+
+- `export_raw_csv` → `raw_<run_id>.csv`: one row per repetition, floats written
+  without rounding. The columns can be read by `gsmf.metrics.load_records_csv`.
+- `export_aggregates_csv` → `aggregates_<run_id>.csv`: one row per target with
+  version, valid/invalid/failed counts, and mean/median/sample stdev/min/max of
+  net energy, duration, energy per task and EDP from the stored `metrics` rows.
+  Confidence intervals (FR-5) are not computed here yet.
+
+Demo with the **illustrative sample data** (run from the repository root):
+
+```bash
+mkdir -p results
+python - <<'PY'
+from pathlib import Path
+from gsmf.config import load_config
+from gsmf.metrics import compute_metrics, load_records_csv
+from gsmf.models import PlatformKind, TestbedSettings
+from gsmf.storage import ResultStore
+
+store = ResultStore(Path("results/gsmf.db"))
+store.initialize_schema()
+store.save_run("demo-run", load_config(Path("examples/benchmark.yaml")),
+               {PlatformKind.FASTAPI: "baseline-0.1.0"},
+               TestbedSettings("demo-host", "performance", True, ("package-0",)))
+for record in load_records_csv(Path("examples/sample_measurements.csv")):
+    if record.target is PlatformKind.FASTAPI:
+        store.save_repetition(record)
+store.save_metrics(compute_metrics(store.load_repetitions("demo-run")))
+print(store.export_raw_csv("demo-run", Path("results/")))
+print(store.export_aggregates_csv("demo-run", Path("results/")))
+PY
+python -m pytest tests/test_storage.py -q
+```
+
+Output on 15 November 2026, followed by `results/raw_demo-run.csv` and the first
+columns of `results/aggregates_demo-run.csv`:
+
+```text
+results/raw_demo-run.csv
+results/aggregates_demo-run.csv
+```
+
+```text
+run_id,target,repetition_index,status,reason,idle_power_w,gross_energy_j,duration_s,net_energy_j,completed_tasks,workload_errors,started_at
+demo-run,fastapi,1,valid,,12.0,635.2,18.1,418.0,1000,0,
+demo-run,fastapi,2,valid,,12.1,640.0,18.4,417.36,1000,0,
+demo-run,fastapi,3,failed,k6 remote execution failed,,,,,,0,
+```
+
+```text
+run_id,target,target_version,repetitions_total,valid_count,invalid_count,failed_count,metrics_count,net_energy_j_mean
+demo-run,fastapi,baseline-0.1.0,3,2,0,1,2,417.68
+```
+
+Running `UPDATE repetitions SET net_energy_j = 0` against that database printed
+`IntegrityError: repetitions kayıtları değiştirilemez (FR-11)`.
+
+### Storage comparison — SQLite vs CSV vs JSON Lines
+
+```bash
+python comparisons/storage_sqlite_vs_csv_json.py --records 5000 --repeats 5
+```
+
+The script writes the same 5,000 synthetic records (fixed seed; 4,692 valid,
+49 invalid, 259 failed; not energy measurements) to each format one record at
+a time, reads them back, then tries to append a duplicate and change a stored
+value. [Raw output from 15 November 2026](comparisons/results/storage-2026-11-15.jsonl)
+(Linux x86_64, Python 3.13.18, SQLite 3.53.1); write/read times are medians of
+5 runs:
+
+| Format | Write (s) | Read (s) | Size (bytes) | Round trip equal | Duplicate append | Edit stored value |
+|---|---:|---:|---:|---|---|---|
+| SQLite (`ResultStore`) | 5.966098 | 0.017424 | 737280 | true | rejected | rejected by trigger |
+| CSV | 0.046329 | 0.027063 | 673399 | true (without `started_at`) | appended | changed |
+| JSON Lines | 0.065257 | 0.030254 | 1682823 | true | appended | changed |
+
+SQLite writes were the slowest here because `ResultStore` commits each record in
+its own transaction, while the CSV/JSONL writers only append to a file. One
+repetition takes a full workload run, so a few milliseconds per write does not
+affect a benchmark. SQLite was the only format that rejected duplicates and
+edits by itself, which is why FR-11 data is stored there and CSV is used for
+export. The CSV row uses `gsmf.metrics.load_records_csv`, which does not read
+`started_at`. These timings are from one container, not a general speed ranking.
+
+Wireframes for the CLI, CSV export and dashboard are in
+[docs/wireframes/](docs/wireframes/README.md).

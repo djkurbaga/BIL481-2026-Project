@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="460" viewBox="0 0 960 460" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="960" height="460" fill="#ffffff"/>
+  <text x="24" y="34" font-size="20" font-weight="bold" fill="#222">Wireframe 2 — CLI run summary table (FR-12)</text>
+  <rect x="24" y="56" width="912" height="340" rx="8" fill="#f4f4f4" stroke="#555" stroke-width="2"/>
+  <rect x="24" y="56" width="912" height="28" rx="8" fill="#ddd" stroke="#555" stroke-width="2"/>
+  <circle cx="44" cy="70" r="5" fill="#999"/><circle cx="62" cy="70" r="5" fill="#999"/><circle cx="80" cy="70" r="5" fill="#999"/>
+  <text x="450" y="75" font-size="13" fill="#444">Terminal</text>
+  <g font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#222">
+    <text x="40" y="112">$ gsmf run experiments/full.yaml</text>
+    <text x="40" y="134">... 3 targets × 10 repetitions completed; results stored in results/gsmf.db</text>
+    <text x="40" y="166" font-weight="bold">Run RUN_ID — summary (valid repetitions only, mean ± 95% CI)</text>
+    <text x="40" y="192">Target&#160;&#160;&#160;|&#160;Valid/Inv/Fail&#160;|&#160;Net&#160;energy&#160;(J)&#160;|&#160;Energy/task&#160;(J/task)&#160;|&#160;EDP&#160;(J·s)&#160;|&#160;SCI&#160;(gCO2eq/1k&#160;tasks)</text>
+    <text x="40" y="210">---------+----------------+----------------+----------------------+-----------+----------------------</text>
+    <text x="40" y="230">fastapi&#160;&#160;|&#160;&#160;&#160;&#160;&#160;&#160;n&#160;/&#160;n&#160;/&#160;n&#160;|&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xxxx&#160;±&#160;x.xx&#160;|&#160;x.x&#160;±&#160;x.x&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx</text>
+    <text x="40" y="250">budibase&#160;|&#160;&#160;&#160;&#160;&#160;&#160;n&#160;/&#160;n&#160;/&#160;n&#160;|&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xxxx&#160;±&#160;x.xx&#160;|&#160;x.x&#160;±&#160;x.x&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx</text>
+    <text x="40" y="270">appsmith&#160;|&#160;&#160;&#160;&#160;&#160;&#160;n&#160;/&#160;n&#160;/&#160;n&#160;|&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xxxx&#160;±&#160;x.xx&#160;|&#160;x.x&#160;±&#160;x.x&#160;|&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;x.xx&#160;±&#160;x.xx</text>
+    <text x="40" y="302">Skipped repetitions: budibase #4 failed: stack did not become healthy</text>
+    <text x="40" y="322">Report: reports/RUN_ID.md&#160;&#160;&#160;&#160;Export: gsmf export --run-id RUN_ID --out results/</text>
+    <text x="40" y="354">$ ▌</text>
+  </g>
+  <g font-size="13" fill="#222">
+    <rect x="24" y="406" width="430" height="36" fill="#fff" stroke="#888" stroke-dasharray="5 4"/>
+    <text x="34" y="429">Failed/invalid counts always shown with reasons</text>
+    <rect x="474" y="406" width="462" height="36" fill="#fff" stroke="#888" stroke-dasharray="5 4"/>
+    <text x="484" y="429">Units in every header; values read only from stored records</text>
+  </g>
+</svg>
