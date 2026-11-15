@@ -106,8 +106,11 @@ Existing method signatures are unchanged. For Docker-free tests, assign a
 `subprocess.run`-compatible callable to `manager.runner` before starting it;
 return `subprocess.CompletedProcess` with text output. Commands use argument
 lists and finite timeouts (`manager.command_timeout_s`, default 120 seconds).
-Health polling uses the configured deadline. Tests inject command responses,
-HTTP responses and a clock:
+Both lifecycle implementations run each HTTP probe in a short-lived Python
+process, which is killed and reaped when the remaining timeout expires. This
+bounds DNS resolution, redirects and slow response headers together, apart from
+OS process startup/cleanup overhead. Tests inject command responses and a clock;
+regression tests also use a real local HTTP server (Docker is not required):
 
 ```bash
 python -m pytest -q
@@ -134,7 +137,8 @@ Compose 5.1.4 and Docker SDK 7.2.0. Every run reported `status=ok` and
 
 Both paths use the same prebuilt image, port and health endpoint. Build time and
 client setup are excluded; per-phase timings and the image ID are in the raw
-output. Order alternates between repetitions. Compose manages its project
+output. This recorded snapshot predates the total HTTP timeout fix; rerun the
+comparison to measure the current implementation's additional probe process cost. Order alternates between repetitions. Compose manages its project
 network; the SDK path creates the single baseline container on Docker's default
 network. These are local end-to-end observations, not a general speed ranking or
 energy measurements. GSMF keeps Compose for multi-service targets; the SDK demo

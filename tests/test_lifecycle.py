@@ -1,8 +1,6 @@
 """UC2 durum geçişlerini Docker olmadan, enjekte edilmiş süreçlerle sınar."""
 
-from contextlib import nullcontext
 from dataclasses import replace
-from http.client import BadStatusLine
 import json
 from pathlib import Path
 import subprocess
@@ -59,9 +57,9 @@ def healthy_http(monkeypatch):
 
     def get(url, timeout):
         calls.append((url, timeout))
-        return nullcontext(SimpleNamespace(status=200))
+        return 200
 
-    monkeypatch.setattr(lifecycle, "urlopen", get)
+    monkeypatch.setattr(lifecycle, "http_status", get)
     return calls
 
 
@@ -226,7 +224,7 @@ def test_invalid_timeout(manager, target, timeout):
         manager.wait_until_healthy(target, timeout)
 
 
-@pytest.mark.parametrize("failure", [URLError("bağlantı yok"), TimeoutError("bekleme doldu"), BadStatusLine("bozuk HTTP")])
+@pytest.mark.parametrize("failure", [URLError("bağlantı yok"), TimeoutError("bekleme doldu"), OSError("bozuk HTTP")])
 def test_http_failure_times_out(manager, target, monkeypatch, clock, failure):
     manager.runner = FakeRunner("", RUNNING, RUNNING)
 
@@ -234,7 +232,7 @@ def test_http_failure_times_out(manager, target, monkeypatch, clock, failure):
         assert 0 < timeout <= 0.5 - clock.now
         raise failure
 
-    monkeypatch.setattr(lifecycle, "urlopen", unavailable)
+    monkeypatch.setattr(lifecycle, "http_status", unavailable)
     manager.start(target)
     with pytest.raises(ExecutionFailure, match="zaman aşımı"):
         manager.wait_until_healthy(target, 0.5)
@@ -245,9 +243,7 @@ def test_http_failure_times_out(manager, target, monkeypatch, clock, failure):
 def test_http_error_then_recovery(manager, target, monkeypatch, clock):
     manager.runner = FakeRunner("", RUNNING, RUNNING)
     responses = iter([503, 204])
-    monkeypatch.setattr(lifecycle, "urlopen", lambda *args, **kwargs: nullcontext(
-        SimpleNamespace(status=next(responses)),
-    ))
+    monkeypatch.setattr(lifecycle, "http_status", lambda *args, **kwargs: next(responses))
     manager.start(target)
     manager.wait_until_healthy(target, 1)
     assert manager.state is StackState.HEALTHY
@@ -267,9 +263,9 @@ def test_late_http_success_is_rejected(manager, target, monkeypatch, clock):
 
     def late_response(url, timeout):
         clock.now += 2
-        return nullcontext(SimpleNamespace(status=200))
+        return 200
 
-    monkeypatch.setattr(lifecycle, "urlopen", late_response)
+    monkeypatch.setattr(lifecycle, "http_status", late_response)
     manager.start(target)
     with pytest.raises(ExecutionFailure, match="zaman aşımı"):
         manager.wait_until_healthy(target, 1)

@@ -4,14 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
-from http.client import HTTPException
 import json
 import math
 import subprocess
 import time
-from urllib.error import URLError
-from urllib.request import urlopen
 
+from gsmf.health import http_status
 from gsmf.models import ExecutionFailure, StackState, TargetPlatform
 
 
@@ -124,12 +122,12 @@ class StackManager:
             remaining = deadline - time.monotonic()
             if ready and remaining > 0:
                 try:
-                    with urlopen(target.health_url, timeout=min(5.0, remaining)) as response:
-                        if 200 <= response.status < 300 and time.monotonic() < deadline:
-                            self._state = StackState.HEALTHY
-                            return
-                        last_error = f"HTTP {response.status}"
-                except (OSError, URLError, HTTPException, ValueError) as exc:
+                    status = http_status(target.health_url, timeout=min(5.0, remaining))
+                    if 200 <= status < 300 and time.monotonic() < deadline:
+                        self._state = StackState.HEALTHY
+                        return
+                    last_error = f"HTTP {status}"
+                except (OSError, ValueError) as exc:
                     last_error = str(exc)
             remaining = deadline - time.monotonic()
             if remaining > 0:

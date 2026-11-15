@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-from http.client import HTTPException
 import json
 import os
 from pathlib import Path
@@ -16,8 +15,6 @@ import platform
 import subprocess
 import sys
 import time
-from urllib.error import URLError
-from urllib.request import urlopen
 from uuid import uuid4
 
 # Betik doğrudan çalıştırıldığında da depo paketini bulabilsin.
@@ -25,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from gsmf.config import load_config
+from gsmf.health import http_status
 from gsmf.lifecycle import StackManager
 from gsmf.models import ExecutionFailure, TargetPlatform
 
@@ -88,10 +86,10 @@ class SDKBaseline:
             remaining = deadline - time.monotonic()
             if state["Status"] == "running" and health in ("", "healthy") and remaining > 0:
                 try:
-                    with urlopen(target.health_url, timeout=min(5.0, remaining)) as response:
-                        if 200 <= response.status < 300 and time.monotonic() < deadline:
-                            return
-                except (OSError, URLError, HTTPException):
+                    status = http_status(target.health_url, timeout=min(5.0, remaining))
+                    if 200 <= status < 300 and time.monotonic() < deadline:
+                        return
+                except (OSError, ValueError):
                     pass
             remaining = deadline - time.monotonic()
             if remaining > 0:
