@@ -37,7 +37,7 @@ Project membership does not imply that every member has reviewed this revision.
 
 ### 1.1 Overview and scope
 
-QA protects configuration validity, stack isolation, metric correctness and preservation of raw results. Traceability follows [requirements.md](requirements.md) and the current [diagram index](diagrams/README.md): UC1 → FR-1, UC2 → FR-3, UC3 → FR-8, UC4 → FR-11. The older `uml-diagrams.md` calls UC4 a dashboard; this plan uses the implemented persistence/export contract. The dashboard is FR-13 and remains planned.
+QA protects configuration validity, stack isolation, metric correctness and preservation of raw results. Traceability follows [requirements.md](requirements.md) and the current [diagram index](diagrams/README.md): UC1 → FR-1, UC2 → FR-3, UC3 → FR-8, UC4 → FR-11. An earlier diagram draft (since removed) called UC4 a dashboard; this plan uses the implemented persistence/export contract. The dashboard is FR-13 and remains planned.
 
 Review requirements and shared dataclass interfaces before changing behavior. Run the automated suite on each proposed merge, record the commit and environment, and add a regression test for each reproduced defect. Review error paths as carefully as successful paths: invalid configuration must never launch a stack; failed shutdown must block the next target; invalid measurements must never enter valid aggregates.
 
