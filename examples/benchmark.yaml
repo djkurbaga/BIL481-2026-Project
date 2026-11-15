@@ -1,0 +1,14 @@
+# UC1 ve UC2 için küçük yerel demo; enerji ölçümü değildir.
+title: FastAPI yaşam döngüsü demosu
+targets:
+  - kind: fastapi
+    compose_file: ../apps/fastapi-baseline/docker-compose.yml
+    base_url: http://127.0.0.1:8000
+    health_url: http://127.0.0.1:8000/health
+    health_timeout_s: 60
+workload_size: 10
+concurrency: 1
+repetitions: 1
+cooldown_s: 0
+# Gerçek kıyaslamada ayrı k6 makinesinin adresiyle değiştirin.
+load_generator_host: loadgen.example
