@@ -1,0 +1,4 @@
+{"python": "3.13.18", "sqlite": "3.53.1", "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39", "records": 5000, "repeats": 5, "statuses": {"valid": 4692, "invalid": 49, "failed": 259}}
+{"format": "sqlite", "write_s": 5.966098, "read_s": 0.017424, "bytes": 737280, "round_trip_equal": true, "started_at_preserved": true, "duplicate_append": "reddedildi", "tamper_existing_value": "reddedildi (repetitions kayıtları değiştirilemez (FR-11))"}
+{"format": "csv", "write_s": 0.046329, "read_s": 0.027063, "bytes": 673399, "round_trip_equal": true, "started_at_preserved": false, "duplicate_append": "eklendi", "tamper_existing_value": "değiştirildi"}
+{"format": "jsonl", "write_s": 0.065257, "read_s": 0.030254, "bytes": 1682823, "round_trip_equal": true, "started_at_preserved": true, "duplicate_append": "eklendi", "tamper_existing_value": "değiştirildi"}
