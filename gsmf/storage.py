@@ -173,10 +173,11 @@ _UNSAFE_FILENAME_CHARS = re.compile(r"[^A-Za-z0-9._-]")
 
 
 def _to_jsonable(value: Any) -> Any:
-    """Dataclass alanlarını JSON'a yazılabilir türlere (Path→str, Enum→değer) çevirir."""
+        """Dataclass alanlarını JSON'a yazılabilir türlere (Path→"/" ayraçlı str, Enum→değer) çevirir."""
     if isinstance(value, Enum):
         return value.value
     if isinstance(value, PurePath):
+                # Windows'ta da "/" ayracıyla yazılsın; kayıt her işletim sisteminde aynı olur.
         return value.as_posix()
     if isinstance(value, Mapping):
         return {str(k): _to_jsonable(v) for k, v in value.items()}

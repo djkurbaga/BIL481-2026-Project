@@ -118,6 +118,8 @@ def sqlite_read(path: Path) -> list[RepetitionRecord]:
 def sqlite_tamper(path: Path) -> str:
     """Saklanan bir net enerji değerini doğrudan SQL ile değiştirmeyi dener."""
     try:
+        # closing(): "with connect()" yalnızca işlemi bitirir, bağlantıyı kapatmaz;
+        # Windows açık dosyayı silemediği için geçici dizin temizliği başarısız olur.
         with contextlib.closing(sqlite3.connect(path)) as conn, conn:
             conn.execute("UPDATE repetitions SET net_energy_j = 0 WHERE id = 1")
         return "değiştirildi"
