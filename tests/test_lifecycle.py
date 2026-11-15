@@ -215,3 +215,69 @@ def test_double_start_does_not_issue_another_command(manager, target):
     with pytest.raises(ExecutionFailure, match="kapanışı"):
         manager.start(target)
     assert len(runner.calls) == 1
+
+
+@pytest.mark.parametrize("timeout", [0, -1, True, "1", float("nan"), float("inf"), 10**400])
+def test_invalid_timeout(manager, target, timeout):
+    manager.runner = FakeRunner("")
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="timeout_s"):
+        manager.wait_until_healthy(target, timeout)
+
+
+@pytest.mark.parametrize("failure", [URLError("bağlantı yok"), TimeoutError("bekleme doldu")])
+def test_http_failure_times_out(manager, target, monkeypatch, clock, failure):
+    manager.runner = FakeRunner("", RUNNING, RUNNING)
+
+    def unavailable(url, timeout):
+        assert 0 < timeout <= 0.5 - clock.now
+        raise failure
+
+    monkeypatch.setattr(lifecycle, "urlopen", unavailable)
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="zaman aşımı"):
+        manager.wait_until_healthy(target, 0.5)
+    assert clock.now == 0.5
+    assert manager.state is StackState.FAILED
+
+
+def test_http_error_then_recovery(manager, target, monkeypatch, clock):
+    manager.runner = FakeRunner("", RUNNING, RUNNING)
+    responses = iter([503, 204])
+    monkeypatch.setattr(lifecycle, "urlopen", lambda *args, **kwargs: nullcontext(
+        SimpleNamespace(status=next(responses)),
+    ))
+    manager.start(target)
+    manager.wait_until_healthy(target, 1)
+    assert manager.state is StackState.HEALTHY
+    assert clock.now == 0.25
+
+
+def test_container_health_must_pass_before_http(manager, target, healthy_http, clock):
+    manager.runner = FakeRunner("", '[{"State":"running","Health":"starting"}]', RUNNING)
+    manager.start(target)
+    manager.wait_until_healthy(target, 1)
+    assert len(healthy_http) == 1
+    assert clock.now == 0.25
+
+
+def test_late_http_success_is_rejected(manager, target, monkeypatch, clock):
+    manager.runner = FakeRunner("", RUNNING)
+
+    def late_response(url, timeout):
+        clock.now += 2
+        return nullcontext(SimpleNamespace(status=200))
+
+    monkeypatch.setattr(lifecycle, "urlopen", late_response)
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="zaman aşımı"):
+        manager.wait_until_healthy(target, 1)
+
+
+def test_compose_poll_is_bounded_by_health_deadline(manager, target, clock):
+    runner = FakeRunner("", subprocess.TimeoutExpired("ps", 0.1))
+    manager.runner = runner
+    manager.start(target)
+    with pytest.raises(ExecutionFailure, match="Komut"):
+        manager.wait_until_healthy(target, 0.1)
+    assert runner.calls[-1][1]["timeout"] == 0.1
