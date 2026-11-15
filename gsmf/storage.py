@@ -231,14 +231,15 @@ def _safe_filename_part(run_id: str) -> str:
 def _resolve_out_path(out_path: Path, prefix: str, run_id: str) -> Path:
     """Çıktı yolunu belirler: dizinse içine ``<prefix>_<run_id>.csv`` yazılır.
 
-    Var olan bir dizin veya sonu ayraçla biten bir yol dizin kabul edilir;
-    aksi halde ``out_path`` doğrudan dosya yolu olarak kullanılır.
+    ``.csv`` uzantılı ve dizin olmayan bir yol doğrudan dosya yolu olarak
+    kullanılır; diğer tüm yollar (ör. henüz var olmayan ``results/``) dizin
+    kabul edilir. ``Path("results/")`` sondaki ayracı sakladığı için bu
+    ayrım uzantıya göre yapılır.
     """
-    raw = str(out_path)
     path = Path(out_path)
-    if path.is_dir() or raw.endswith(("/", "\\")):
-        return path / f"{prefix}_{_safe_filename_part(run_id)}.csv"
-    return path
+    if path.suffix.lower() == ".csv" and not path.is_dir():
+        return path
+    return path / f"{prefix}_{_safe_filename_part(run_id)}.csv"
 
 
 def _write_csv(path: Path, header: Sequence[str], rows: Iterable[Sequence[Any]]) -> Path:
@@ -567,7 +568,8 @@ class ResultStore:
     def export_raw_csv(self, run_id: str, out_path: Path) -> Path:
         """Ham tekrar kayıtlarını CSV dosyasına yazar ve dosya yolunu döndürür.
 
-        ``out_path`` bir dizinse dosya ``raw_<run_id>.csv`` adıyla içine yazılır.
+        ``out_path`` ``.csv`` ile bitmiyorsa dizin kabul edilir (gerekirse
+        oluşturulur) ve dosya ``raw_<run_id>.csv`` adıyla içine yazılır.
         Başarısız ve geçersiz kayıtlar durum ve sebepleriyle birlikte yazılır;
         değerler veritabanındakiyle birebir aynıdır (float'lar kayıpsız).
 
@@ -587,7 +589,8 @@ class ResultStore:
         ``metrics`` tablosunda saklanan metriklerin ortalama, medyan, örneklem
         standart sapması, en küçük ve en büyük değeri yazılır. İstatistikler
         yalnızca saklanmış metriklerden hesaplanır; ham kayıtlar değiştirilmez.
-        ``out_path`` bir dizinse dosya ``aggregates_<run_id>.csv`` adıyla yazılır.
+        ``out_path`` ``.csv`` ile bitmiyorsa dizin kabul edilir ve dosya
+        ``aggregates_<run_id>.csv`` adıyla içine yazılır.
 
         Raises:
             StorageError: run_id bulunamazsa veya dosya yazılamazsa.

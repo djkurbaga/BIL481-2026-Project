@@ -407,6 +407,25 @@ def test_export_raw_csv_to_directory_uses_default_name(store: ResultStore, tmp_p
     assert read_csv(out) == []
 
 
+@pytest.mark.parametrize("name", ["results/", "results", "out.v2"])
+def test_export_to_new_directory_creates_it(store: ResultStore, tmp_path: Path, monkeypatch, name):
+    """Henüz var olmayan ve .csv ile bitmeyen yol dizin olarak oluşturulur."""
+    monkeypatch.chdir(tmp_path)
+    raw = store.export_raw_csv(RUN, Path(name))
+    agg = store.export_aggregates_csv(RUN, Path(name))
+    folder = tmp_path / name.rstrip("/")
+    assert folder.is_dir()
+    assert raw.resolve() == folder / f"raw_{RUN}.csv"
+    assert agg.resolve() == folder / f"aggregates_{RUN}.csv"
+
+
+def test_export_to_existing_directory_named_like_csv(store: ResultStore, tmp_path: Path):
+    """.csv ile biten ama var olan bir dizin yine dizin olarak kullanılır."""
+    folder = tmp_path / "eski.csv"
+    folder.mkdir()
+    assert store.export_raw_csv(RUN, folder) == folder / f"raw_{RUN}.csv"
+
+
 def test_export_empty_run_writes_header_only(store: ResultStore, tmp_path: Path):
     """Kaydı olmayan çalıştırma için yalnızca başlık satırı yazılır."""
     out = store.export_raw_csv(RUN, tmp_path / "raw.csv")
