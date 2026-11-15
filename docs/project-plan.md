@@ -220,20 +220,21 @@ The project has no monetary cost; all software is free or open source and hardwa
 |-|-|-|-|-|
 |Requirements and planning|R|**A**|R|R|
 |Design|**A**|R|R|R|
-|FR-1 Configuration file|||**A**||
-|FR-2 Reference application||R (Budibase)|**A** (FastAPI)|R (Appsmith)|
-|FR-3 Docker stack lifecycle|||**A**||
-|FR-4 Idle power measurement|**A**||||
-|FR-5 Warm-up phase||||**A**|
-|FR-6 Remote k6 workload and energy|R|||**A**|
-|FR-7 Net energy, energy per task, EDP|**A**||||
-|FR-8 Repetitions and cooldown|||**A**||
-|FR-9 Statistics|**A**||||
-|FR-10 Operational SCI|**A**||||
-|FR-11 Storage and CSV export||**A**|||
-|FR-12 Terminal summary and report||**A**|||
-|FR-13 Dashboard|||**A**||
-|FR-14 Scaphandre (optional)|**A**||||
+|Reference applications (deliverable)||R (Budibase)|**A** (FastAPI)|R (Appsmith)|
+|FR-1 Benchmark configuration|||**A**||
+|FR-2 Execution prerequisites|**A**||||
+|FR-3 Isolated stack lifecycle|||**A**||
+|FR-4 Repetition and cooldown control|||**A**||
+|FR-5 Idle baseline measurement|**A**||||
+|FR-6 Remote reference workload (k6)||||**A**|
+|FR-7 Workload energy and baseline correction|**A**|||R|
+|FR-8 Efficiency metrics (energy per task, EDP)|**A**||||
+|FR-9 Statistical aggregation|**A**||||
+|FR-10 Operational SCI calculation|**A**||||
+|FR-11 Result persistence and CSV export||**A**|||
+|FR-12 Summary and report generation||**A**|||
+|FR-13 Results dashboard|||**A**||
+|FR-14 Per-container diagnostics (optional)|**A**||||
 |Testing and NFR verification|R|R||**A**|
 |Documentation|R|**A**|R|R|
 
