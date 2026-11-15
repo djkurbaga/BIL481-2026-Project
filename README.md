@@ -39,3 +39,25 @@ python -m pytest                                          # runs tests/test_metr
 
 If the `·` in `J·s` looks garbled on a Windows terminal, run with `PYTHONIOENCODING=utf-8`.
 UML diagrams and shared interfaces are documented in [docs/diagrams/README.md](docs/diagrams/README.md).
+
+## UC1 — YAML benchmark configuration (FR-1)
+
+Install `requirements.txt`, then validate the example without starting Docker:
+
+```bash
+python -c 'from pathlib import Path; from gsmf.config import load_config; print(load_config(Path("examples/benchmark.yaml")))'
+python -m pytest tests/test_config.py -q
+```
+
+Required top-level fields: `title`, `targets`, `workload_size`, `concurrency`,
+`repetitions`, `cooldown_s`, `load_generator_host`. Each target requires `kind`,
+`compose_file`, `base_url` and `health_url`. Supported kinds are `budibase`,
+`appsmith` and `fastapi`. `health_timeout_s` defaults to 120 seconds;
+`grid_carbon_intensity` is optional (gCO2eq/kWh).
+
+Counts must be positive integers (booleans and numeric strings are rejected).
+Cooldown and carbon intensity must be finite and non-negative; health timeout
+must be finite and positive. URLs must use HTTP(S). Errors raise `ConfigError`
+with the field name; loading never starts a stack. Relative Compose paths are
+resolved against the YAML file's directory. File existence is checked by Compose
+when starting the target. `validate_config` leaves relative paths unchanged.
