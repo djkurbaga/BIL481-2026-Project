@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from http.client import HTTPException
 import json
 import math
 import subprocess
@@ -128,7 +129,7 @@ class StackManager:
                             self._state = StackState.HEALTHY
                             return
                         last_error = f"HTTP {response.status}"
-                except (OSError, URLError, ValueError) as exc:
+                except (OSError, URLError, HTTPException, ValueError) as exc:
                     last_error = str(exc)
             remaining = deadline - time.monotonic()
             if remaining > 0:

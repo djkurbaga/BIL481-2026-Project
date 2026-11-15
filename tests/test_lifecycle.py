@@ -2,6 +2,7 @@
 
 from contextlib import nullcontext
 from dataclasses import replace
+from http.client import BadStatusLine
 import json
 from pathlib import Path
 import subprocess
@@ -225,7 +226,7 @@ def test_invalid_timeout(manager, target, timeout):
         manager.wait_until_healthy(target, timeout)
 
 
-@pytest.mark.parametrize("failure", [URLError("bağlantı yok"), TimeoutError("bekleme doldu")])
+@pytest.mark.parametrize("failure", [URLError("bağlantı yok"), TimeoutError("bekleme doldu"), BadStatusLine("bozuk HTTP")])
 def test_http_failure_times_out(manager, target, monkeypatch, clock, failure):
     manager.runner = FakeRunner("", RUNNING, RUNNING)
 
