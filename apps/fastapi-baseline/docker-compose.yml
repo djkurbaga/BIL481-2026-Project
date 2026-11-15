@@ -1,0 +1,7 @@
+name: gsmf-fastapi-baseline
+services:
+  api:
+    build: .
+    image: gsmf-fastapi-baseline:demo
+    ports:
+      - "127.0.0.1:8000:8000"
