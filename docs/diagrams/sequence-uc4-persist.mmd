@@ -1,0 +1,39 @@
+%% UML Sıralama Diyagramı — UC4 Sonuçları sakla ve dışa aktar (FR-11)
+sequenceDiagram
+    autonumber
+    actor R as Researcher
+    participant RUN as runner
+    participant CLI as gsmf CLI
+    participant ST as ResultStore
+    participant DB as SQLite
+    participant FS as CSV files
+
+    RUN->>ST: initialize_schema()
+    ST->>DB: CREATE TABLE IF NOT EXISTS ...
+    RUN->>ST: save_run(run_id, config, target_versions, testbed)
+    ST->>DB: INSERT run, config, versions, testbed settings
+    loop for each repetition (VALID, INVALID and FAILED)
+        RUN->>ST: save_repetition(record)
+        ST->>DB: INSERT repetition with status and reason
+        alt record already exists or write fails
+            ST-->>RUN: raise StorageError (no UPDATE is performed)
+        end
+    end
+
+    R->>CLI: gsmf export --run-id RUN_ID --out results/
+    CLI->>ST: export_raw_csv(run_id, out_path)
+    ST->>DB: SELECT * FROM repetitions WHERE run_id = ?
+    alt run_id not found
+        ST-->>CLI: raise StorageError
+        CLI-->>R: error message
+    else found
+        DB-->>ST: rows
+        ST->>FS: write raw_RUN_ID.csv
+        CLI->>ST: export_aggregates_csv(run_id, out_path)
+        ST->>DB: SELECT valid rows grouped by target
+        DB-->>ST: aggregates
+        ST->>FS: write aggregates_RUN_ID.csv
+        ST-->>CLI: paths
+        CLI-->>R: exported file paths
+    end
+    Note over ST,DB: Stored measured values are read-only after insertion

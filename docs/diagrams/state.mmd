@@ -1,0 +1,30 @@
+%% UML Durum Makinesi Diyagramı — hedef yığın (StackState) ve tekrar durumu (RepetitionStatus)
+stateDiagram-v2
+    direction LR
+
+    state "Target stack lifecycle (StackState)" as Stack {
+        [*] --> STARTING : start(target)
+        STARTING --> HEALTHY : health check passes within timeout_s
+        STARTING --> FAILED : compose up error / health timeout
+        HEALTHY --> RUNNING : mark_running()
+        HEALTHY --> STOPPING : stop(target)
+        RUNNING --> STOPPING : workload finished or failed / stop(target)
+        STOPPING --> STOPPED : shutdown confirmed
+        STOPPING --> FAILED : shutdown not confirmed
+        STOPPED --> [*]
+        FAILED --> [*] : reported as execution failure
+    }
+
+    state "Repetition status (RepetitionStatus)" as Rep {
+        [*] --> InProgress
+        InProgress --> FAILED_R : stack or k6 execution failure
+        InProgress --> Measured : workload completed
+        state check <<choice>>
+        Measured --> check
+        check --> INVALID : unreadable counters / net energy < 0 / completed tasks = 0
+        check --> VALID : all checks pass
+        VALID --> [*] : metrics computed (UC3)
+        INVALID --> [*] : stored with reason, no metrics
+        FAILED_R --> [*] : stored with reason, no metrics
+        state "FAILED" as FAILED_R
+    }

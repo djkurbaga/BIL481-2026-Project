@@ -1,0 +1,45 @@
+%% UML Sıralama Diyagramı — UC2 İzole yığın yaşam döngüsü (FR-3)
+sequenceDiagram
+    autonumber
+    participant RUN as runner
+    participant SM as StackManager
+    participant D as Docker Engine
+    participant APP as Target stack
+
+    loop for each target in BenchmarkConfig.targets
+        RUN->>SM: start(target)
+        Note right of SM: state = STARTING
+        SM->>D: docker compose -f compose_file up -d
+        alt compose up fails
+            D-->>SM: non-zero exit
+            SM-->>RUN: raise ExecutionFailure (state = FAILED)
+        else containers created
+            D-->>SM: ok
+            RUN->>SM: wait_until_healthy(target, timeout_s)
+            loop until healthy or timeout_s elapsed
+                SM->>APP: GET health_url
+                APP-->>SM: status
+            end
+            alt timeout
+                SM-->>RUN: raise ExecutionFailure (state = FAILED)
+            else healthy
+                Note right of SM: state = HEALTHY
+                RUN->>SM: mark_running()
+                Note right of SM: state = RUNNING
+                RUN->>RUN: idle + workload measurement (FR-5 – FR-7)
+            end
+        end
+        RUN->>SM: stop(target)
+        Note right of SM: state = STOPPING
+        SM->>D: docker compose -f compose_file down
+        SM->>D: docker compose ps (verify no containers)
+        alt shutdown confirmed
+            D-->>SM: empty
+            Note right of SM: state = STOPPED
+            SM-->>RUN: ok
+        else shutdown not confirmed
+            SM-->>RUN: raise ExecutionFailure (state = FAILED)
+            Note over RUN: abort: next target is NOT started
+        end
+        RUN->>RUN: sleep(cooldown_s)
+    end

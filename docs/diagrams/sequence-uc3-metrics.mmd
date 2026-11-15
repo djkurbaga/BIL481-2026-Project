@@ -1,0 +1,28 @@
+%% UML Sıralama Diyagramı — UC3 Verimlilik metriklerini hesapla (FR-8)
+sequenceDiagram
+    autonumber
+    actor R as Researcher
+    participant CLI as gsmf CLI
+    participant ST as ResultStore (UC4)
+    participant M as metrics
+
+    R->>CLI: request metrics for run_id
+    CLI->>ST: load_repetitions(run_id)
+    ST-->>CLI: list[RepetitionRecord]
+    CLI->>M: compute_metrics(records)
+    loop for each RepetitionRecord
+        M->>M: compute_repetition_metrics(record)
+        M->>M: skip_reason(record)
+        alt status is FAILED or INVALID
+            Note right of M: skipped, no metric computed
+        else completed_tasks <= 0 or missing values
+            Note right of M: skipped (guard against division by zero)
+        else VALID
+            M->>M: energy_per_task(net_energy_j, completed_tasks)<br/>= net_energy_j / completed_tasks  [J/task]
+            M->>M: energy_delay_product(net_energy_j, duration_s)<br/>= net_energy_j × duration_s  [J·s]
+            Note right of M: new EfficiencyMetrics<br/>(source record is not modified)
+        end
+    end
+    M-->>CLI: list[EfficiencyMetrics]
+    CLI->>ST: save_metrics(metrics)
+    CLI-->>R: results table (J/task, J·s)
