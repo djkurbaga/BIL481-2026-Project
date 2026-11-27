@@ -1,0 +1,13 @@
+# UC1 demo: bilerek GEÇERSİZ yapılandırma. "bubble" desteklenen bir hedef değildir
+# (desteklenenler: budibase, appsmith, fastapi); load_config ConfigError vermelidir.
+title: Invalid target demo
+targets:
+  - kind: bubble
+    compose_file: ../apps/fastapi-baseline/docker-compose.yml
+    base_url: http://127.0.0.1:8000
+    health_url: http://127.0.0.1:8000/health
+workload_size: 10
+concurrency: 1
+repetitions: 1
+cooldown_s: 0
+load_generator_host: loadgen.example
