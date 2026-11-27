@@ -33,7 +33,7 @@ bash scripts/demo.sh --require-docker
 | Step | What the demo does | Expected result |
 |---|---|---|
 | UC1 (FR-1) | Loads `examples/benchmark.yaml`, then `examples/invalid-benchmark.yaml` | Valid config accepted; invalid target `bubble` rejected with `ConfigError` |
-| UC2 (FR-3) | Builds and starts `apps/fastapi-baseline` with Docker Compose, waits for the health check, stops it | `healthy` → `running` → `stopped`, no containers left. Without Docker it prints `SKIPPED: Docker not available` |
+| UC2 (FR-3) | Builds and starts `apps/fastapi-baseline` with Docker Compose, waits for the health check, stops it | `healthy` → `running` → `stopped`, no containers left. Docker unavailability fails the commands above. |
 | UC3 (FR-8) | Prints J/task and EDP for `examples/sample_measurements.csv` (**illustrative sample data, not real measurements**) | 6 of 9 repetitions get metrics; 3 are skipped with reasons |
 | UC4 (FR-11) | Saves the FastAPI rows to SQLite, tries a duplicate insert and a direct `UPDATE`, exports CSVs | Both changes rejected; `raw_demo-run.csv` and `aggregates_demo-run.csv` written |
 
@@ -42,7 +42,7 @@ Output goes to `results/demo/` (ignored by git; recreated on every run). Use
 script exits with code 1 if any step fails. For formal acceptance runs,
 `--require-docker` makes unavailable Docker a UC2 failure. Omit the flag to
 run a partial demo with UC2 skipped when Docker is unavailable. UC2 prints a
-unique Compose project name for that run and binds port 8000 on loopback.
+unique Compose project name for that run and requires loopback port 8000 to be free.
 See the [deployment plan](docs/a3/deployment-plan.md#21-step-by-step-procedure)
 for project-scoped recovery if teardown is interrupted.
 Recorded outputs for Assignment 3 are in [docs/a3/logs/](docs/a3/logs/).

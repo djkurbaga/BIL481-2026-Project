@@ -89,7 +89,7 @@ The recorded run in [§4](#4-logs-and-outputs) used Windows 11, Python 3.14.2, D
 
 ### 2.1 Step-by-Step Procedure
 
-1. From the repository root at the revision under test, record `git rev-parse HEAD`, the OS, `python --version`, `docker info` and `docker compose version` with the run evidence.
+1. From the repository root at the revision under test, record `git rev-parse HEAD`, the OS, `docker info` and `docker compose version` with the run evidence.
 2. Create a virtual environment and install the dependencies. On Linux, activate it in the current shell.
 
    ```bash
@@ -106,7 +106,7 @@ The recorded run in [§4](#4-logs-and-outputs) used Windows 11, Python 3.14.2, D
    & $env:PYTHON -m pip install -r requirements.txt
    ```
 
-3. Validate the Compose configuration with `docker compose -f apps/fastapi-baseline/docker-compose.yml config --quiet`. Run the automated tests with `python -m pytest -q` on Linux or `& $env:PYTHON -m pytest -q` on PowerShell. Add `--junitxml=<path>` when collecting machine-readable results.
+3. Record the selected interpreter version using `python --version` on Linux or `& $env:PYTHON --version` on PowerShell. Validate the Compose configuration with `docker compose -f apps/fastapi-baseline/docker-compose.yml config --quiet`. Run the automated tests with `python -m pytest -q` on Linux or `& $env:PYTHON -m pytest -q` on PowerShell. Add `--junitxml=<path>` when collecting machine-readable results.
 4. Run the demo in acceptance mode with `--require-docker`, using a separate `--out` path for each evidence run.
 
    ```bash

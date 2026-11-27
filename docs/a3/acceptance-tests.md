@@ -123,7 +123,7 @@ To be written by: TBD
 | Requirement | Criteria | Acceptance test | Evidence |
 |---|---|---|---|
 | FR-1 / UC1 | AC-1.1, AC-1.2 | [AT-1](#21-at-1--uc1-configure-benchmark-fr-1) | [UC1 demo output](logs/demo-output.txt), [configuration tests](../../tests/test_config.py) and [recorded pytest results](logs/pytest-output.txt) |
-| FR-3 / UC2 | AC-2.1, AC-2.2, AC-2.3 | [AT-2](#22-at-2--uc2-manage-isolated-stack-lifecycle-fr-3) | [FastAPI demo output](logs/demo-output.txt) for AC-2.1 and normal exit under AC-2.2; [lifecycle tests](../../tests/test_lifecycle.py), [HTTP deadline tests](../../tests/test_health_deadline.py) and [recorded pytest results](logs/pytest-output.txt) for failure paths and AC-2.3 |
+| FR-3 / UC2 | AC-2.1, AC-2.2, AC-2.3 | [AT-2](#22-at-2--uc2-manage-isolated-stack-lifecycle-fr-3) | AC-2.1 and normal exit under AC-2.2 ([demo output](logs/demo-output.txt)). Failure paths and AC-2.3 ([lifecycle tests](../../tests/test_lifecycle.py), [HTTP deadline tests](../../tests/test_health_deadline.py), [recorded pytest results](logs/pytest-output.txt)). |
 
 The archived demo output is from `a437796`, which ran UC2 in the default `gsmf-fastapi-baseline` Compose project. The AT-2 procedure above uses a per-run project and `--require-docker` in the current demo.
 
