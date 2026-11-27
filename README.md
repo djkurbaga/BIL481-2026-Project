@@ -1,6 +1,6 @@
 # BIL481 — Fall 2026 Term Project
 
-[Project Assignment 1 description](f26_assignment_1.pdf)
+[Project Assignment 1 description](f26_assignment1.pdf)
 
 ## Group Name
 
