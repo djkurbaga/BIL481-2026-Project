@@ -222,3 +222,9 @@ retains the full warning. This includes 63 new comparison checks (62 corpus
 variants and one report/input-preservation check) in
 `tests/test_config_comparison.py`. No Docker/RAPL system run or peer usability
 session was performed for this revision.
+
+Update, 27 November 2026: the suite now has **307 tests** (one regression
+test was added for platform-independent Compose paths). On Windows 11 with
+Python 3.14.2, `python -m pytest -v` reported **307 passed**; see the
+[Assignment 3 test logs](a3/logs/pytest-output.txt). The 15 November record
+above is kept unchanged as the evidence for that revision.
