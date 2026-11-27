@@ -24,10 +24,10 @@ Docker Engine with the Compose plugin is needed only for UC2.
 pip install -r requirements.txt
 
 # Windows (PowerShell)
-powershell -ExecutionPolicy Bypass -File scripts/demo.ps1
+powershell -ExecutionPolicy Bypass -File scripts/demo.ps1 --require-docker
 
 # Linux
-bash scripts/demo.sh
+bash scripts/demo.sh --require-docker
 ```
 
 | Step | What the demo does | Expected result |
@@ -39,7 +39,9 @@ bash scripts/demo.sh
 
 Output goes to `results/demo/` (ignored by git; recreated on every run). Use
 `--out <dir>` to change it. Each step prints `PASS`, `FAIL` or `SKIPPED`, and the
-script exits with code 1 if any step fails. Port 8000 must be free for UC2.
+script exits with code 1 if any step fails. For formal acceptance runs,
+`--require-docker` makes unavailable Docker a UC2 failure. Omit the flag to
+run a partial demo with UC2 skipped. Port 8000 must be free for UC2.
 Recorded outputs for Assignment 3 are in [docs/a3/logs/](docs/a3/logs/).
 
 

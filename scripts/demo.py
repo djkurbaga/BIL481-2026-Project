@@ -2,10 +2,11 @@
 
 Depo kökünden çalıştırın (veya scripts/demo.ps1 / scripts/demo.sh ile):
 
-    python scripts/demo.py [--out results/demo]
+    python scripts/demo.py [--out results/demo] [--require-docker]
 
 Her adım PASS, FAIL veya SKIPPED olarak raporlanır. Docker yoksa UC2 adımı
 "SKIPPED: Docker not available" yazar; asla başarılı gibi gösterilmez.
+--require-docker verilirse Docker olmadan UC2 başarısız sayılır.
 Herhangi bir adım FAIL olursa çıkış kodu 1'dir.
 """
 
@@ -105,10 +106,12 @@ def _docker_available() -> tuple[bool, str]:
     return True, ""
 
 
-def uc2_lifecycle() -> str:
+def uc2_lifecycle(*, require_docker: bool = False) -> str:
     """FastAPI baseline yığınını başlatır, sağlığını bekler, durdurur ve kapanışı doğrular."""
     available, reason = _docker_available()
     if not available:
+        if require_docker:
+            raise StepFailed(f"Docker not available: {reason}")
         # Docker yoksa sahte bir başarı üretmeden adımı atla.
         print("[UC2] SKIPPED: Docker not available")
         print(f"      reason: {reason}")
@@ -236,6 +239,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=REPO / "results" / "demo",
                         help="directory for the UC4 SQLite database and exported CSVs "
                              "(default: results/demo)")
+    parser.add_argument("--require-docker", action="store_true",
+                        help="fail UC2 if Docker Engine or Compose is unavailable")
     args = parser.parse_args(argv)
     out_dir = args.out if args.out.is_absolute() else (Path.cwd() / args.out)
 
@@ -250,7 +255,8 @@ def main(argv: list[str] | None = None) -> int:
 
     steps: list[tuple[str, Callable[[], str]]] = [
         ("UC1 Configure benchmark (FR-1)", uc1_configure),
-        ("UC2 Manage isolated stack lifecycle (FR-3)", uc2_lifecycle),
+        ("UC2 Manage isolated stack lifecycle (FR-3)",
+         lambda: uc2_lifecycle(require_docker=args.require_docker)),
         ("UC3 Compute efficiency metrics (FR-8)", uc3_metrics),
         ("UC4 Persist and export results (FR-11)", lambda: uc4_persist(out_dir)),
     ]
