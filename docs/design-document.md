@@ -206,6 +206,7 @@ class ResultStore:
 | Command | Purpose |
 |---|---|
 | `python -m gsmf.metrics examples/sample_measurements.csv` | UC3: print J/task and EDP per repetition, with skip reasons |
+| `scripts/demo.ps1` (Windows) / `scripts/demo.sh` (Linux) | Run UC1–UC4 end to end (added for Assignment 3; UC2 is skipped when Docker is unavailable) |
 | `python -m pytest -q` | Run the automated test suite |
 | `python comparisons/config_manual_vs_pydantic.py --iterations 1000 --repeats 5` | UC1 technology comparison |
 | `python comparisons/lifecycle_subprocess_vs_docker_sdk.py --repetitions 3` | UC2 technology comparison (needs Docker and the built baseline image) |
