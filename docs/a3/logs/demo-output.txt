@@ -1,0 +1,70 @@
+GSMF demo — Python 3.14.2 on Windows 11
+
+========================================================================
+UC1 Configure benchmark (FR-1)
+========================================================================
+[UC1] valid config: examples/benchmark.yaml
+      accepted: title='FastAPI yaşam döngüsü demosu', targets=['fastapi'], workload_size=10, concurrency=1, repetitions=1, cooldown_s=0.0
+[UC1] invalid config: examples/invalid-benchmark.yaml (expected rejection)
+      rejected as expected: ConfigError: targets[0].kind: desteklenmeyen hedef 'bubble'; desteklenenler: budibase, appsmith, fastapi
+      no Docker stack was started
+
+========================================================================
+UC2 Manage isolated stack lifecycle (FR-3)
+========================================================================
+[UC2] building image: docker compose -f apps/fastapi-baseline/docker-compose.yml build
+[UC2] start: fastapi, health_url=http://127.0.0.1:8000/health, timeout=60.0 s
+      state after health check: healthy
+      state during workload gate: running
+      state after stop: stopped
+      shutdown confirmed: no containers left (docker compose ps --all --quiet is empty)
+
+========================================================================
+UC3 Compute efficiency metrics (FR-8)
+========================================================================
+[UC3] input: examples/sample_measurements.csv
+      ILLUSTRATIVE SAMPLE DATA - NOT REAL MEASUREMENTS
+
+Target   | Rep | Status  | Net energy (J) | Duration (s) | Tasks | Energy/task (J/task) | EDP (J·s) | Note
+---------+-----+---------+----------------+--------------+-------+----------------------+-----------+---------------------------------------------------
+fastapi  |   1 | valid   |         418.00 |        18.10 |  1000 |               0.4180 |   7,565.8 |
+fastapi  |   2 | valid   |         417.36 |        18.40 |  1000 |               0.4174 |   7,679.4 |
+fastapi  |   3 | failed  |              - |            - |     - |                    - |         - | skipped: status=failed: k6 remote execution failed
+appsmith |   1 | valid   |       1,280.40 |        33.40 |  1000 |               1.2804 |  42,765.4 |
+appsmith |   2 | valid   |       1,279.12 |        33.90 |   998 |               1.2817 |  43,362.2 |
+appsmith |   3 | invalid |              - |            - |     0 |                    - |         - | skipped: status=invalid: zero completed user tasks
+budibase |   1 | valid   |       1,862.10 |        43.20 |  1000 |               1.8621 |  80,442.7 |
+budibase |   2 | invalid |              - |            - |  1000 |                    - |         - | skipped: status=invalid: negative net energy
+budibase |   3 | valid   |       1,871.64 |        43.60 |  1000 |               1.8716 |  81,603.5 |
+
+6 of 9 repetitions used for metrics; 3 skipped (failed/invalid/zero tasks).
+
+========================================================================
+UC4 Persist and export results (FR-11)
+========================================================================
+[UC4] database: docs/a3/logs/uc4-export/gsmf-demo.db
+      testbed settings are demo placeholders (FR-2 prerequisite checks are not implemented)
+      stored repetitions: 3 (#1 valid, #2 valid, #3 failed)
+      stored metrics: 2 (valid repetitions only)
+      duplicate insert rejected as expected: tekrar kaydı zaten var: run_id='demo-run', target=fastapi, repetition_index=1
+      direct UPDATE rejected as expected: repetitions kayıtları değiştirilemez (FR-11)
+
+      exported: docs/a3/logs/uc4-export/raw_demo-run.csv
+run_id,target,repetition_index,status,reason,idle_power_w,gross_energy_j,duration_s,net_energy_j,completed_tasks,workload_errors,started_at
+demo-run,fastapi,1,valid,,12.0,635.2,18.1,418.0,1000,0,
+demo-run,fastapi,2,valid,,12.1,640.0,18.4,417.36,1000,0,
+demo-run,fastapi,3,failed,k6 remote execution failed,,,,,,0,
+
+      exported: docs/a3/logs/uc4-export/aggregates_demo-run.csv
+run_id,target,target_version,repetitions_total,valid_count,invalid_count,failed_count,metrics_count,net_energy_j_mean,net_energy_j_median,net_energy_j_stdev,net_energy_j_min,net_energy_j_max,duration_s_mean,duration_s_median,duration_s_stdev,duration_s_min,duration_s_max,energy_per_task_j_mean,energy_per_task_j_median,energy_per_task_j_stdev,energy_per_task_j_min,energy_per_task_j_max,edp_js_mean,edp_js_median,edp_js_stdev,edp_js_min,edp_js_max,energy_per_task_unit,edp_unit
+demo-run,fastapi,baseline-0.1.0,3,2,0,1,2,417.68,417.68,0.45254833995938076,417.36,418.0,18.25,18.25,0.21213203435596226,18.1,18.4,0.41768,0.41768,0.00045254833995937195,0.41736,0.418,7622.612,7622.612,80.34430090554014,7565.8,7679.424,J/task,J·s
+
+========================================================================
+Summary
+========================================================================
+PASS     UC1 Configure benchmark (FR-1)
+PASS     UC2 Manage isolated stack lifecycle (FR-3)
+PASS     UC3 Compute efficiency metrics (FR-8)
+PASS     UC4 Persist and export results (FR-11)
+
+4 passed, 0 failed, 0 skipped
