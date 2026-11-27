@@ -15,6 +15,33 @@ Intellectual property
 |Murat Yılmaz|@yilmazmurat06|yilmazmurat@etu.edu.tr|241101063|
 |Furkan Yaman|@furkany22|fyaman@etu.edu.tr|221301015|
 
+## One-command demo (UC1–UC4)
+
+Runs all four use cases end to end from a fresh clone. Requires Python 3.11+;
+Docker Engine with the Compose plugin is needed only for UC2.
+
+```bash
+pip install -r requirements.txt
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -File scripts/demo.ps1
+
+# Linux
+bash scripts/demo.sh
+```
+
+| Step | What the demo does | Expected result |
+|---|---|---|
+| UC1 (FR-1) | Loads `examples/benchmark.yaml`, then `examples/invalid-benchmark.yaml` | Valid config accepted; invalid target `bubble` rejected with `ConfigError` |
+| UC2 (FR-3) | Builds and starts `apps/fastapi-baseline` with Docker Compose, waits for the health check, stops it | `healthy` → `running` → `stopped`, no containers left. Without Docker it prints `SKIPPED: Docker not available` |
+| UC3 (FR-8) | Prints J/task and EDP for `examples/sample_measurements.csv` (**illustrative sample data, not real measurements**) | 6 of 9 repetitions get metrics; 3 are skipped with reasons |
+| UC4 (FR-11) | Saves the FastAPI rows to SQLite, tries a duplicate insert and a direct `UPDATE`, exports CSVs | Both changes rejected; `raw_demo-run.csv` and `aggregates_demo-run.csv` written |
+
+Output goes to `results/demo/` (ignored by git; recreated on every run). Use
+`--out <dir>` to change it. Each step prints `PASS`, `FAIL` or `SKIPPED`, and the
+script exits with code 1 if any step fails. Port 8000 must be free for UC2.
+Recorded outputs for Assignment 3 are in [docs/a3/logs/](docs/a3/logs/).
+
 
 
 

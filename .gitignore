@@ -32,3 +32,6 @@ build/
 dist/
 coverage/
 .pytest_cache/
+
+# Local demo output (scripts/demo.py default --out)
+results/
