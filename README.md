@@ -41,7 +41,10 @@ Output goes to `results/demo/` (ignored by git; recreated on every run). Use
 `--out <dir>` to change it. Each step prints `PASS`, `FAIL` or `SKIPPED`, and the
 script exits with code 1 if any step fails. For formal acceptance runs,
 `--require-docker` makes unavailable Docker a UC2 failure. Omit the flag to
-run a partial demo with UC2 skipped. Port 8000 must be free for UC2.
+run a partial demo with UC2 skipped when Docker is unavailable. UC2 prints a
+unique Compose project name for that run and binds port 8000 on loopback.
+See the [deployment plan](docs/a3/deployment-plan.md#21-step-by-step-procedure)
+for project-scoped recovery if teardown is interrupted.
 Recorded outputs for Assignment 3 are in [docs/a3/logs/](docs/a3/logs/).
 
 

@@ -21,6 +21,7 @@ import subprocess
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from uuid import uuid4
 
 # Depo kökünü içe aktarma yoluna ekle; kurulum yapmadan "import gsmf" çalışsın.
 REPO = Path(__file__).resolve().parent.parent
@@ -44,7 +45,6 @@ from gsmf.storage import ResultStore  # noqa: E402
 VALID_CONFIG = REPO / "examples" / "benchmark.yaml"
 INVALID_CONFIG = REPO / "examples" / "invalid-benchmark.yaml"
 SAMPLE_CSV = REPO / "examples" / "sample_measurements.csv"
-COMPOSE_FILE = REPO / "apps" / "fastapi-baseline" / "docker-compose.yml"
 RUN_ID = "demo-run"
 
 
@@ -117,17 +117,23 @@ def uc2_lifecycle(*, require_docker: bool = False) -> str:
         print(f"      reason: {reason}")
         return "SKIPPED"
 
+    target = load_config(VALID_CONFIG).targets[0]
+    # Temizlik başka bir demo veya elle başlatılmış baseline yığınını etkilemesin.
+    project = f"gsmf-a3-demo-{uuid4().hex}"
+    compose_command = ("docker", "compose", "--project-name", project)
+    print(f"[UC2] project={project}, compose_file={target.compose_file}", flush=True)
+
     # İmajı önceden oluştur; derleme süresi sağlık zaman aşımına sayılmasın.
-    print(f"[UC2] building image: docker compose -f {COMPOSE_FILE.relative_to(REPO).as_posix()} build")
     # Docker çıktısı UTF-8'dir; Windows'un varsayılan kod sayfasıyla okunursa çöker.
-    build = subprocess.run(["docker", "compose", "-f", str(COMPOSE_FILE), "build"],
-                           capture_output=True, text=True, encoding="utf-8", errors="replace",
-                           timeout=900, check=False)
+    build = subprocess.run(
+        [*compose_command, "-f", str(target.compose_file), "build"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=900, check=False,
+    )
     if build.returncode != 0:
         raise StepFailed(f"image build failed: {(build.stderr or build.stdout).strip()}")
 
-    target = load_config(VALID_CONFIG).targets[0]
-    manager = StackManager()
+    manager = StackManager(compose_command)
     print(f"[UC2] start: {target.kind.value}, health_url={target.health_url}, "
           f"timeout={target.health_timeout_s} s")
     try:
