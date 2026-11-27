@@ -4,6 +4,7 @@ from dataclasses import replace
 import json
 from pathlib import Path
 import subprocess
+import sys
 from types import SimpleNamespace
 from urllib.error import URLError
 
@@ -124,6 +125,20 @@ def test_custom_compose_command(target):
     manager.runner = runner
     manager.start(target)
     assert runner.calls[0][0][0] == "custom-compose"
+
+
+def test_compose_error_decodes_utf8_even_with_invalid_bytes(target):
+    script = (
+        "import sys\n"
+        "sys.stderr.buffer.write('başlatma hatası'.encode('utf-8') + bytes([255]))\n"
+        "sys.exit(1)"
+    )
+    manager = StackManager((sys.executable, "-c", script))
+
+    with pytest.raises(ExecutionFailure, match="başlatma hatası�"):
+        manager.start(target)
+
+    assert manager.state is StackState.FAILED
 
 
 def test_stop_is_idempotent(manager, target):
