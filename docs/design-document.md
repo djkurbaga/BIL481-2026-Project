@@ -68,7 +68,7 @@ GSMF uses a layered architecture. The **presentation layer** is the CLI. The **s
 | Storage | SQLite (Python `sqlite3`) | SQLite 3.53.1 in the recorded comparison | UC4 result store |
 | Export | CSV (Python `csv`) | — | UC4 raw and aggregate export, UC3 demo input |
 | Reference baseline | FastAPI + Uvicorn in Docker | `fastapi==0.163.1`, `uvicorn==0.54.0` | UC2 demo target (`apps/fastapi-baseline/`) |
-| Testing | pytest; HTTPX for the FastAPI test client | `pytest>=8.0`, `httpx>=0.28,<1` | 306 automated tests |
+| Testing | pytest; HTTPX for the FastAPI test client | `pytest>=8.0`, `httpx>=0.28,<1` | 307 automated tests |
 | Comparison only | Pydantic, Docker SDK for Python | `pydantic==2.13.4`, `docker==7.2.0` | `comparisons/` scripts; not used by GSMF itself |
 | Diagrams | Mermaid (`@mermaid-js/mermaid-cli`) | — | `docs/diagrams/*.mmd` → PNG |
 
@@ -94,7 +94,7 @@ examples/
   benchmark.yaml              example UC1 configuration (one FastAPI target)
   sample_measurements.csv     illustrative sample repetitions, not real measurements
 comparisons/                  technology comparison scripts and their recorded outputs (results/)
-tests/                        pytest suite (306 tests)
+tests/                        pytest suite (307 tests)
 docs/diagrams/                Mermaid sources and PNGs (source of truth for UML)
 docs/wireframes/              SVG/PNG wireframes of the CLI, CSV export and dashboard
 .github/ISSUE_TEMPLATE/       bug report template used by the QA plan
@@ -107,10 +107,10 @@ docs/wireframes/              SVG/PNG wireframes of the CLI, CSV export and dash
 | `tests/test_health_deadline.py` | 5 | UC2 total HTTP health deadline against a real local server |
 | `tests/test_fastapi_baseline.py` | 2 | Baseline `/health` contract and example config |
 | `tests/test_metrics.py` | 16 | UC3 formulas, skipped records, zero tasks, units, CSV, CLI |
-| `tests/test_storage.py` | 33 | UC4 schema, insert-only rules, triggers, metrics checks, CSV export |
+| `tests/test_storage.py` | 34 | UC4 schema, insert-only rules, triggers, metrics checks, CSV export |
 | `tests/test_*_comparison.py` | 9 | The three comparison scripts |
 
-Test functions are counted above; parametrized cases expand them to 306 collected tests.
+Test functions are counted above; parametrized cases expand them to 307 collected tests.
 
 ### 2.2 Key Implementations and Core Logic
 

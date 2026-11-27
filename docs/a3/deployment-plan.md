@@ -1,11 +1,9 @@
 # Deployment Plan
 
-<!-- Section headings are a proposed structure. Check them against the Assignment 3 handout before filling in. -->
-
 **Project:** Green Software Metrics Framework (GSMF)  
 **Course:** BIL 481 Software Engineering, Fall 2026  
 **Group:** Intellectual Property  
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** 27-11-2026
 
 ## List of Contributors
@@ -21,93 +19,85 @@
 
 | Version | Date | Author | Description |
 |---|---|---|---|
-| 1.0 | 27-11-2026 | Reşat Efe Koca | Initial skeleton and §9 Logs and Outputs |
+| 1.0 | 27-11-2026 | Reşat Efe Koca | Initial skeleton and §4 Logs and Outputs |
+| 1.1 | 27-11-2026 | Reşat Efe Koca | Align section headings with the Assignment 3 handout; add Task Matrix |
+
+## Task Matrix
+
+**A** = accountable author, **R** = reviewer. TBD rows are assigned by the team.
+
+| Section | Reşat | Bülent | Murat | Furkan |
+|---|---|---|---|---|
+| 1 Deployment Overview | TBD | TBD | TBD | TBD |
+| 2 Deployment Process | TBD | TBD | TBD | TBD |
+| 3 Configuration Plan | TBD | TBD | TBD | TBD |
+| 4 Logs and Outputs | **A** | TBD | TBD | TBD |
 
 ## Contribution Table
 
 | Member | Sections / contribution |
 |---|---|
-| Reşat Efe Koca (@djkurbaga) | §9 Logs and Outputs; other sections TBD |
+| Reşat Efe Koca (@djkurbaga) | §4 Logs and Outputs; other sections TBD |
 | Bülent Çakır (@BulentCakirr) | TBD |
 | Murat Yılmaz (@yilmazmurat06) | TBD |
 | Furkan Yaman (@furkany22) | TBD |
 
 ## Table of Contents
 
-1. [Introduction](#1-introduction)
-   1. [Purpose](#11-purpose)
-   2. [Scope (UC1–UC4)](#12-scope-uc1uc4)
-2. [Deployment Environment](#2-deployment-environment)
-   1. [Hardware](#21-hardware)
-   2. [Operating System](#22-operating-system)
-   3. [Software Prerequisites](#23-software-prerequisites)
-3. [Deployment Architecture](#3-deployment-architecture)
-4. [Installation and Configuration](#4-installation-and-configuration)
-   1. [Installation Steps](#41-installation-steps)
-   2. [Configuration](#42-configuration)
-5. [Deployment Verification](#5-deployment-verification)
-6. [Rollback and Recovery](#6-rollback-and-recovery)
-7. [Maintenance and Monitoring](#7-maintenance-and-monitoring)
-8. [Risks and Mitigations](#8-risks-and-mitigations)
-9. [Logs and Outputs](#9-logs-and-outputs)
+1. [Deployment Overview](#1-deployment-overview)
+   1. [Approach](#11-approach)
+   2. [Tools](#12-tools)
+   3. [Environment](#13-environment)
+2. [Deployment Process](#2-deployment-process)
+   1. [Step-by-Step Procedure](#21-step-by-step-procedure)
+   2. [Scripts and Tools](#22-scripts-and-tools)
+   3. [Configurations](#23-configurations)
+3. [Configuration Plan](#3-configuration-plan)
+   1. [Final Configuration](#31-final-configuration)
+   2. [Changes Made During Deployment](#32-changes-made-during-deployment)
+4. [Logs and Outputs](#4-logs-and-outputs)
 
 <div style="page-break-after: always;"></div>
 
-## 1 Introduction
+## 1 Deployment Overview
 
-### 1.1 Purpose
-
-To be written by: TBD
-
-### 1.2 Scope (UC1–UC4)
+### 1.1 Approach
 
 To be written by: TBD
 
-## 2 Deployment Environment
-
-### 2.1 Hardware
+### 1.2 Tools
 
 To be written by: TBD
 
-### 2.2 Operating System
+### 1.3 Environment
 
 To be written by: TBD
 
-### 2.3 Software Prerequisites
+## 2 Deployment Process
+
+### 2.1 Step-by-Step Procedure
 
 To be written by: TBD
 
-## 3 Deployment Architecture
+### 2.2 Scripts and Tools
 
 To be written by: TBD
 
-## 4 Installation and Configuration
-
-### 4.1 Installation Steps
+### 2.3 Configurations
 
 To be written by: TBD
 
-### 4.2 Configuration
+## 3 Configuration Plan
+
+### 3.1 Final Configuration
 
 To be written by: TBD
 
-## 5 Deployment Verification
+### 3.2 Changes Made During Deployment
 
 To be written by: TBD
 
-## 6 Rollback and Recovery
-
-To be written by: TBD
-
-## 7 Maintenance and Monitoring
-
-To be written by: TBD
-
-## 8 Risks and Mitigations
-
-To be written by: TBD
-
-## 9 Logs and Outputs
+## 4 Logs and Outputs
 
 Recorded by Reşat Efe Koca on 27 November 2026 from commit `a437796` (branch `feature/a3-demo-and-logs`). The files are unedited command outputs; see [environment.txt](logs/environment.txt) for the exact commands and versions.
 
