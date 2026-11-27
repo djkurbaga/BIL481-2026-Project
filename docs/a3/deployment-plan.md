@@ -3,7 +3,7 @@
 **Project:** Green Software Metrics Framework (GSMF)  
 **Course:** BIL 481 Software Engineering, Fall 2026  
 **Group:** Intellectual Property  
-**Version:** 1.2\
+**Version:** 1.3\
 **Date:** 27-11-2026
 
 ## List of Contributors
@@ -22,6 +22,7 @@
 | 1.0 | 27-11-2026 | Reşat Efe Koca | Initial skeleton and §4 Logs and Outputs |
 | 1.1 | 27-11-2026 | Reşat Efe Koca | Align section headings with the Assignment 3 handout; add Task Matrix |
 | 1.2 | 27-11-2026 | Murat Yılmaz | Document the demo environment, deployment procedure and cleanup in §§1–2 |
+| 1.3 | 27-11-2026 | Murat Yılmaz | Record the final demo configuration and how to track changes in §3 |
 
 ## Task Matrix
 
@@ -31,16 +32,16 @@
 |---|---|---|---|---|
 | 1 Deployment Overview | TBD | TBD | **A** | TBD |
 | 2 Deployment Process | TBD | TBD | **A** | TBD |
-| 3 Configuration Plan | TBD | TBD | TBD | TBD |
+| 3 Configuration Plan | TBD | TBD | **A** | TBD |
 | 4 Logs and Outputs | **A** | TBD | TBD | TBD |
 
 ## Contribution Table
 
 | Member | Sections / contribution |
 |---|---|
-| Reşat Efe Koca (@djkurbaga) | §4 Logs and Outputs; other sections TBD |
+| Reşat Efe Koca (@djkurbaga) | §4 Logs and Outputs |
 | Bülent Çakır (@BulentCakirr) | TBD |
-| Murat Yılmaz (@yilmazmurat06) | §§1–2 Demo deployment, environment prerequisites and cleanup (AI-assisted) |
+| Murat Yılmaz (@yilmazmurat06) | §§1–3 Demo deployment, environment prerequisites, configuration and cleanup (AI-assisted) |
 | Furkan Yaman (@furkany22) | TBD |
 
 ## Table of Contents
@@ -140,11 +141,20 @@ The demo reads the checked-in positive and negative YAML fixtures and the sample
 
 ### 3.1 Final Configuration
 
-To be written by: TBD
+| Item | Setting |
+|---|---|
+| [Positive benchmark fixture](../../examples/benchmark.yaml) | `fastapi` target with `workload_size=10`, `concurrency=1`, `repetitions=1` and `cooldown_s=0`. `load_generator_host=loadgen.example` is a placeholder. |
+| [FastAPI Compose project](../../apps/fastapi-baseline/docker-compose.yml) | Service `api`, image `gsmf-fastapi-baseline:demo`, published at `127.0.0.1:8000`. The demo overrides the file's default project name with a generated name for each run. |
+| [Baseline image](../../apps/fastapi-baseline/Dockerfile) | Built from `python:3.11-slim` with the [FastAPI and Uvicorn versions](../../apps/fastapi-baseline/requirements.txt) pinned in the application dependencies. |
+| Health check | `GET http://127.0.0.1:8000/health`, with a 60-second UC2 readiness deadline from the YAML. |
+| [Negative benchmark fixture](../../examples/invalid-benchmark.yaml) | `targets[0].kind` is `bubble`, which must raise `ConfigError` before any stack operation. |
+| [Measurement fixture](../../examples/sample_measurements.csv) | Illustrative records for three platforms. UC3 uses the fixture as supplied. UC4 stores only FastAPI records under `demo-run` and writes demo testbed metadata. |
 
 ### 3.2 Changes Made During Deployment
 
-To be written by: TBD
+Assignment 3 added the demo wrappers, the negative configuration fixture and an output-directory option. The demo prebuilds the image so that dependency installation is outside the 60-second readiness deadline. The recorded `a437796` run used the Compose file's default project name, `gsmf-fastapi-baseline`, and completed all four steps with Docker available. Subsequent runs use their own Compose project and can require Docker explicitly with `--require-docker`.
+
+For a rerun, keep the source revision and fixtures with the run evidence. Record any configuration changes, capture the resolved Compose configuration with `docker compose -f apps/fastapi-baseline/docker-compose.yml config`, and repeat any affected acceptance tests. See [Change Management Plan](../project-plan.md#8-change-management-plan) for project-level review and measurement freeze rules.
 
 ## 4 Logs and Outputs
 
