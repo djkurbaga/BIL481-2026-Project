@@ -3,7 +3,7 @@
 **Project:** Green Software Metrics Framework (GSMF)  
 **Course:** BIL 481 Software Engineering, Fall 2026  
 **Group:** Intellectual Property  
-**Version:** 1.2  
+**Version:** 1.3\
 **Date:** 27-11-2026
 
 ## List of Contributors
@@ -22,6 +22,7 @@
 | 1.0 | 27-11-2026 | Reşat Efe Koca | Initial skeleton and §3 Logs and Outputs |
 | 1.1 | 27-11-2026 | Reşat Efe Koca | Align section headings with the Assignment 3 handout; add Task Matrix |
 | 1.2 | 27-11-2026 | Bülent Çakır | Write §1 Test Results Overview, §2 Test Results Analysis and §4 Abstract |
+| 1.3 | 27-11-2026 | Murat Yılmaz | Record follow-up FR-3 and minimum-Python verification in §2 |
 
 ## Task Matrix
 
@@ -30,7 +31,7 @@
 | Section | Reşat | Bülent | Murat | Furkan |
 |---|---|---|---|---|
 | 1 Test Results Overview | TBD | **A** | TBD | TBD |
-| 2 Test Results Analysis | TBD | **A** | TBD | TBD |
+| 2 Test Results Analysis | TBD | **A** (§§2.1–2.3) | **A** (§2.4) | TBD |
 | 3 Logs and Outputs | **A** | TBD | TBD | TBD |
 | 4 Abstract (optional) | TBD | **A** | TBD | TBD |
 
@@ -40,7 +41,7 @@
 |---|---|
 | Reşat Efe Koca (@djkurbaga) | §3 Logs and Outputs; other sections TBD |
 | Bülent Çakır (@BulentCakirr) | §1 Test Results Overview, §2 Test Results Analysis, §4 Abstract (AI-assisted, written from the recorded logs in `docs/a3/logs/`) |
-| Murat Yılmaz (@yilmazmurat06) | TBD |
+| Murat Yılmaz (@yilmazmurat06) | UC2 corrections and §2 follow-up verification (AI-assisted) |
 | Furkan Yaman (@furkany22) | TBD |
 
 ## Table of Contents
@@ -52,6 +53,7 @@
    1. [Discrepancies](#21-discrepancies)
    2. [Failure Causes](#22-failure-causes)
    3. [Potential Solutions](#23-potential-solutions)
+   4. [Follow-up Verification](#24-follow-up-verification)
 3. [Logs and Outputs](#3-logs-and-outputs)
 4. [Abstract (optional)](#4-abstract-optional)
 
@@ -110,11 +112,25 @@ The failures seen before the recorded run (§1.2) had two causes: platform diffe
 
 | Risk or gap | Proposed action | Owner |
 |---|---|---|
-| Untested minimum Python version | Run the test suite on Python 3.11 and the latest Python, on both Windows and Linux, e.g. with a GitHub Actions matrix. | Team |
+| Minimum Python version across supported hosts | The macOS suite passed on Python 3.11 and 3.14 (see §2.4). Run the same matrix on Windows and Linux. | Team |
 | Broken commits reaching `main` (issue 3) | Run `python -m pytest -q` before every push; a CI check on pull requests would block such merges. | Team |
-| Locale-dependent decoding of Docker output | `gsmf/lifecycle.py` reads Compose output with `text=True` but no explicit encoding, so on Windows it uses the system code page; non-ASCII output could fail to decode. Passing `encoding="utf-8", errors="replace"` (as `gsmf/health.py` already does) removes this risk. | UC2 owner (Murat) |
+| Locale-dependent decoding of Docker output | Fixed in `c86d995`. Compose output uses UTF-8 with replacement for malformed bytes. A subprocess regression test checks that the failure retains its Turkish diagnostic and is raised as `ExecutionFailure`. | UC2 owner (Murat) |
 | Only one target deployed | Add and run Compose files for Budibase and Appsmith in the acceptance run. | FR-2 reference app owners |
 | Placeholder testbed settings, no confidence intervals | Implement FR-2 prerequisite checks and FR-9 statistics, then repeat AT-4 with real settings. | FR-2 / FR-9 owners |
+
+### 2.4 Follow-up Verification
+
+On 27 November 2026, the A3 follow-up implementation and tests at `b561730` were verified on macOS 27.0.1 (arm64). The report's Windows results in §1 and archived logs in §3 refer to `a437796`.
+
+| Check | Environment | Outcome |
+|---|---|---|
+| `python -m pytest -q -p no:cacheprovider` | CPython 3.11.15 with dependencies installed from `requirements.txt` in a fresh virtual environment | 311 passed |
+| `python -m pytest -q -p no:cacheprovider` | CPython 3.14.5 | 311 passed |
+| Docker unavailable | Controlled tests of the default and `--require-docker` invocation | Default UC2 `SKIPPED` with exit code 0. Required-Docker UC2 `FAIL` with exit code 1. |
+| Per-run Compose isolation | Controlled two-run test with an injected Compose runner | Build, startup, health, shutdown and shutdown verification use the configured Compose file and distinct project names. |
+| `bash scripts/demo.sh --require-docker --out <fresh-dir>` | CPython 3.11.15, Docker Desktop Engine 29.4.3, Compose v5.1.4 | 4 passed, 0 failed, 0 skipped. Exit code 0. FastAPI reached `healthy`, `running` and `stopped`. |
+
+After the real-stack run, `docker compose --project-name <printed-project> -f apps/fastapi-baseline/docker-compose.yml ps --all --quiet` exited successfully with empty output. The two new UC4 CSV exports matched the archived Windows [raw](logs/uc4-export/raw_demo-run.csv) and [aggregate](logs/uc4-export/aggregates_demo-run.csv) exports after normalizing line endings. This run used the same illustrative measurement fixture.
 
 ## 3 Logs and Outputs
 

@@ -2,10 +2,11 @@
 
 Depo kökünden çalıştırın (veya scripts/demo.ps1 / scripts/demo.sh ile):
 
-    python scripts/demo.py [--out results/demo]
+    python scripts/demo.py [--out results/demo] [--require-docker]
 
 Her adım PASS, FAIL veya SKIPPED olarak raporlanır. Docker yoksa UC2 adımı
 "SKIPPED: Docker not available" yazar; asla başarılı gibi gösterilmez.
+--require-docker verilirse Docker olmadan UC2 başarısız sayılır.
 Herhangi bir adım FAIL olursa çıkış kodu 1'dir.
 """
 
@@ -20,6 +21,7 @@ import subprocess
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from uuid import uuid4
 
 # Depo kökünü içe aktarma yoluna ekle; kurulum yapmadan "import gsmf" çalışsın.
 REPO = Path(__file__).resolve().parent.parent
@@ -43,7 +45,6 @@ from gsmf.storage import ResultStore  # noqa: E402
 VALID_CONFIG = REPO / "examples" / "benchmark.yaml"
 INVALID_CONFIG = REPO / "examples" / "invalid-benchmark.yaml"
 SAMPLE_CSV = REPO / "examples" / "sample_measurements.csv"
-COMPOSE_FILE = REPO / "apps" / "fastapi-baseline" / "docker-compose.yml"
 RUN_ID = "demo-run"
 
 
@@ -105,26 +106,34 @@ def _docker_available() -> tuple[bool, str]:
     return True, ""
 
 
-def uc2_lifecycle() -> str:
+def uc2_lifecycle(*, require_docker: bool = False) -> str:
     """FastAPI baseline yığınını başlatır, sağlığını bekler, durdurur ve kapanışı doğrular."""
     available, reason = _docker_available()
     if not available:
+        if require_docker:
+            raise StepFailed(f"Docker not available: {reason}")
         # Docker yoksa sahte bir başarı üretmeden adımı atla.
         print("[UC2] SKIPPED: Docker not available")
         print(f"      reason: {reason}")
         return "SKIPPED"
 
+    target = load_config(VALID_CONFIG).targets[0]
+    # Temizlik başka bir demo veya elle başlatılmış baseline yığınını etkilemesin.
+    project = f"gsmf-a3-demo-{uuid4().hex}"
+    compose_command = ("docker", "compose", "--project-name", project)
+    print(f"[UC2] project={project}, compose_file={target.compose_file}", flush=True)
+
     # İmajı önceden oluştur; derleme süresi sağlık zaman aşımına sayılmasın.
-    print(f"[UC2] building image: docker compose -f {COMPOSE_FILE.relative_to(REPO).as_posix()} build")
     # Docker çıktısı UTF-8'dir; Windows'un varsayılan kod sayfasıyla okunursa çöker.
-    build = subprocess.run(["docker", "compose", "-f", str(COMPOSE_FILE), "build"],
-                           capture_output=True, text=True, encoding="utf-8", errors="replace",
-                           timeout=900, check=False)
+    build = subprocess.run(
+        [*compose_command, "-f", str(target.compose_file), "build"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=900, check=False,
+    )
     if build.returncode != 0:
         raise StepFailed(f"image build failed: {(build.stderr or build.stdout).strip()}")
 
-    target = load_config(VALID_CONFIG).targets[0]
-    manager = StackManager()
+    manager = StackManager(compose_command)
     print(f"[UC2] start: {target.kind.value}, health_url={target.health_url}, "
           f"timeout={target.health_timeout_s} s")
     try:
@@ -236,6 +245,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=REPO / "results" / "demo",
                         help="directory for the UC4 SQLite database and exported CSVs "
                              "(default: results/demo)")
+    parser.add_argument("--require-docker", action="store_true",
+                        help="fail UC2 if Docker Engine or Compose is unavailable")
     args = parser.parse_args(argv)
     out_dir = args.out if args.out.is_absolute() else (Path.cwd() / args.out)
 
@@ -250,7 +261,8 @@ def main(argv: list[str] | None = None) -> int:
 
     steps: list[tuple[str, Callable[[], str]]] = [
         ("UC1 Configure benchmark (FR-1)", uc1_configure),
-        ("UC2 Manage isolated stack lifecycle (FR-3)", uc2_lifecycle),
+        ("UC2 Manage isolated stack lifecycle (FR-3)",
+         lambda: uc2_lifecycle(require_docker=args.require_docker)),
         ("UC3 Compute efficiency metrics (FR-8)", uc3_metrics),
         ("UC4 Persist and export results (FR-11)", lambda: uc4_persist(out_dir)),
     ]

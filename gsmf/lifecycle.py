@@ -45,6 +45,7 @@ class StackManager:
         try:
             result = self.runner(
                 command, capture_output=True, text=True, check=False,
+                encoding="utf-8", errors="replace",
                 timeout=self.command_timeout_s if timeout is None else timeout,
             )
         except (OSError, subprocess.SubprocessError) as exc:
